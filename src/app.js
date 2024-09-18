@@ -8,14 +8,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { createTransporter } from "./utils/mailer.js";
+import GoogleStrategy from "passport-google-oauth2";
+import passport from "passport";
 
 // Required for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export class App {
-  constructor() {
-    dotenv.config();
+  constructor() {  
+    dotenv.config()
     this.app = express();
     this.app.use(express.json());
     this.http = new http.Server(this.app);
@@ -23,6 +25,17 @@ export class App {
     this.initMiddleware();
     this.connectToMongoDB();
     this.initRoutes();
+    passport.use(new GoogleStrategy({
+        clientID:     process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_REDIRECT_URI,
+        passReqToCallback   : true
+      },
+      function(request, accessToken, refreshToken, profile, done) {
+        console.log(request, accessToken, refreshToken, profile, done);
+      }
+    ));
+
   }
 
   initMiddleware() {

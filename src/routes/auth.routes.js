@@ -3,6 +3,7 @@ import { bodyValidator } from "../middlewares/bodySchema.middlewares.js";
 import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, sendEmailOTPSchema, sendPhoneOTPSchema, verifyEmailOTPSchema, verifyPhoneOTPSchema } from "../schemas/authentication.schemas.js";
 import { errorHandler } from "../handlers/error.handlers.js";
 import userController from "../controllers/user.controllers.js";
+import passport from "passport";
 
 const authRouter = express.Router();
 
@@ -51,7 +52,14 @@ authRouter.post('/signin',
     errorHandler(userController.signInAccount)
 )
 
-authRouter.get('/google_url',
-    errorHandler(userController)
-)
+authRouter.get('/google',
+    passport.authenticate('google', { scope:
+        [ 'email', 'profile' ] }
+));
+
+authRouter.get( '/google/callback',
+    passport.authenticate( 'google', {
+        successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'
+}));
 export default authRouter;
