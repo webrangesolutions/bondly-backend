@@ -33,7 +33,7 @@ export class App {
         passReqToCallback   : true
       },
       function(request, accessToken, refreshToken, profile, done) {
-        done(null, profile);
+        return done(null, profile.id);
       }
     ));
 
