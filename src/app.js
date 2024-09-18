@@ -26,17 +26,47 @@ export class App {
     this.initMiddleware();
     this.connectToMongoDB();
     this.initRoutes();
+    this.initPassport();
+
+  }
+
+  initPassport(){
+    // Initialize Passport Google OAuth2 Strategy
     passport.use(new GoogleStrategy({
-        clientID:     process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_REDIRECT_URI,
-        passReqToCallback   : true
-      },
-      function(request, accessToken, refreshToken, profile, done) {
-        return done(null, profile.id);
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_REDIRECT_URI,
+      passReqToCallback: true
+    },
+    async (request, accessToken, refreshToken, profile, done) => {
+      try {
+        // Here you can check if the user exists in your database
+        console.log(profile);
+        // For example: const user = await User.findOrCreate({ googleId: profile.id });
+        const user = { id: profile.id, displayName: profile.displayName }; // Example user object
+        return done(null, user); // Pass user to serializeUser
+      } catch (error) {
+        return done(error, null); // Handle errors
       }
+    }
     ));
 
+    // Serialize the user into the session
+    passport.serializeUser((user, done) => {
+    done(null, user.id); // Store only the user ID in the session
+    });
+
+    // Deserialize the user from the session
+    passport.deserializeUser(async (id, done) => {
+    try {
+      // Find the user by ID (this is where you typically query your database)
+      // For example: const user = await User.findById(id);
+      const user = { id, displayName: "John Doe" }; // Example user object
+      done(null, user); // Pass the user object to the next middleware
+    } catch (error) {
+      done(error, null); // Handle errors
+    }
+    });
   }
 
   initMiddleware() {
