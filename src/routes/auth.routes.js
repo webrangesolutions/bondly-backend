@@ -62,4 +62,8 @@ authRouter.get( '/google/callback',
         successRedirect: '/auth/google/success',
         failureRedirect: '/auth/google/failure'
 }));
+
+authRouter.get('/google/success', (req, res)=>{
+    console.log(req, res);
+})
 export default authRouter;
