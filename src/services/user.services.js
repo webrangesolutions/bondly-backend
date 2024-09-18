@@ -134,8 +134,11 @@ const userServices = {
         });
 
         await petOwner.save();
+        let payload = {
+            userId:user._id
+        };
 
-        let createPasswordToken = jwt.sign({userId: user._id}, process.env.JWT_CREATE_PASSWORD_SECRET, {expiresIn: process.env.CREDENTIALS_VALID_TIME*60})
+        let createPasswordToken = createEncryptedJWT(payload, "reset-password");
 
         return {createPasswordToken, user, petOwner}
     },
