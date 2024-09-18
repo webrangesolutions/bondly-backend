@@ -48,6 +48,9 @@ export class App {
     }))
     this.app.use(cors());
     this.app.use(express.json());
+     // Initialize Passport middleware
+     this.app.use(passport.initialize());
+     this.app.use(passport.session()); // Persist login sessions
   }
 
   connectToMongoDB() {
