@@ -31,7 +31,7 @@ export const registerPetOwnerAccountSchema = Joi.object({
 })
 
 export const createPasswordSchema = Joi.object({
-    createPasswordToken: Joi.string().min(1).required(),
+    email: emailSchema.required(),
     password: passwordSchema.required()
 })
 

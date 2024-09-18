@@ -48,22 +48,13 @@ const userServices = {
         await verifiedCredentialsServices.verifyOtpForPhone(phone, otp);
     },
 
-    async createPassword(createPasswordToken, password){
-        let userId = null;
-
-        try{
-            let createPasswordPayload = decryptedEJWT(createPasswordToken, "reset-password");
-            userId = createPasswordPayload.userId;
-            console.log(createPasswordPayload);
-        }
-        catch(err){
-            throw new createError.BadRequest(err.message)
-        }
-
-        let user = await User.findById(userId);
+    async createPassword(email, password){
+        await verifiedCredentialsServices.isEmailVerified(email);
+        
+        let user = await User.findOne({email});
 
         if(!user)
-            throw new createError.NotFound("User not found with given Id");
+            throw new createError.NotFound("User not found with given email id.");
 
         let salt = await bcrypt.genSalt(10);
 
@@ -95,28 +86,23 @@ const userServices = {
     async verifyForgotPasswordEmail(email, otp){
         await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
         
+        
+        console.log('here');
+
         let user = await User.findOne({email});
 
         if(!user)
             throw new createHttpError.NotFound("User not found with given email");
 
-        let payload = {
-            userId:user._id
-        };
 
-        let createPasswordToken = createEncryptedJWT(payload, "reset-password");
-
-        
-
-        return {createPasswordToken};
     },
 
     async registerPetOwnerAccount(email, phone, firstName,
         lastName, address, location){
         await verifiedCredentialsServices.isEmailVerified(email);
 
-        await verifiedCredentialsServices.isPhoneVerified(phone);
-        
+        await verifiedCredentialsServices.isPhoneVerified(phone)
+
         let user = new User({
             email: email,
             phone,
@@ -134,13 +120,8 @@ const userServices = {
         });
 
         await petOwner.save();
-        let payload = {
-            userId:user._id
-        };
 
-        let createPasswordToken = createEncryptedJWT(payload, "reset-password");
-
-        return {createPasswordToken, user, petOwner}
+        return {user, petOwner}
     },
 
     async registerPetCarerAccount(){

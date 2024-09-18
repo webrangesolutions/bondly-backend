@@ -37,7 +37,7 @@ const verifiedCredentialsServices = {
     },
 
     async isEmailVerified(email){
-        let verifiedCredential = await VerifiedCredential.find({email, verified: true});
+        let verifiedCredential = await VerifiedCredential.findOne({email, verified: true});
 
         if(!verifiedCredential)
             throw new createHttpError.BadRequest("Email is not verified");
@@ -77,11 +77,25 @@ const verifiedCredentialsServices = {
     },
 
     async isPhoneVerified(phone){
-        let verifiedCredential = await VerifiedCredential.find({phone, verified: true});
+        let verifiedCredential = await VerifiedCredential.findOne({phone, verified: true});
 
         if(!verifiedCredential)
             throw new createHttpError.BadRequest("Email is not verified");
     },
+
+    async verifyForgotPassword(email, otp){
+        let verifiedCredential = await VerifiedCredential.findOne({phone});
+
+        if(!verifiedCredential)
+            throw new createHttpError.BadRequest("Otp for given email has expired, or doesn't exist");
+
+        if(verifiedCredential.otp != otp)
+            throw new createHttpError.BadRequest("Otp doesn't match");
+
+        verifiedCredential.verified = true;
+
+        await verifiedCredential.save();
+    }
 }
 
 export default verifiedCredentialsServices;

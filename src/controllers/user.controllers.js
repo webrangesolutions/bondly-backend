@@ -47,9 +47,9 @@ const userController = {
     },
 
     async createPassword(req, res, next){
-        let {createPasswordToken, password} = req.body;
+        let {email, password} = req.body;
 
-        let resBody = await userServices.createPassword(createPasswordToken, password)
+        let resBody = await userServices.createPassword(email, password)
 
         return res.status(201).send(dataResponse("New password has been created", resBody));
     },

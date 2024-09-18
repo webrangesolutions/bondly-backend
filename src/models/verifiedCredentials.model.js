@@ -32,7 +32,7 @@ const VerifiedCredentialSchema = new Schema({
 });
 
 // Create a compound index to ensure unique phone numbers (countryCode + number)
-VerifiedCredentialSchema.index({ 'phone.countryCode': 1, 'phone.number': 1 }, { unique: true });
+VerifiedCredentialSchema.index({ 'phone.countryCode': 1, 'phone.number': 1 }, { unique: true, sparse:true });
 // Ensure the TTL index is created properly
 VerifiedCredentialSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
