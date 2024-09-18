@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import router from "./routes/main.routes.js";
 import http from "http";
 import mongoose from "mongoose";
+import expressSession from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -39,6 +40,12 @@ export class App {
   }
 
   initMiddleware() {
+    this.app.use(expressSession({
+      secret: process.env.SESSION_SECRET || 'your-secret-key',
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: false } // Set to true if using HTTPS
+    }))
     this.app.use(cors());
     this.app.use(express.json());
   }
