@@ -6,17 +6,17 @@ const userController = {
     async sendSignupOtpToEmail(req, res, next){
         let {email} = req.body;
 
-        let resBody = await userServices.sendSignupOtpToEmail(email);
+        await userServices.sendSignupOtpToEmail(email);
 
-        return res.status(200).send(dataResponse("Sign up Otp has been sent to email", resBody))
+        return res.status(200).send(dataResponse("Sign up Otp has been sent to email"))
     },
 
     async verifySignUpEmail(req, res, next){
-        let {encryptedOtpToken, otp} = req.body;
+        let {email, otp} = req.body;
 
-        let resBody = await userServices.verifySignUpEmail(encryptedOtpToken, otp);
+        await userServices.verifySignUpEmail(email, otp);
 
-        return res.status(200).send(dataResponse("Email has been verified successfully", resBody))
+        return res.status(200).send(dataResponse("Email has been verified successfully"))
     },
 
     async sendSignupOtpToPhone(req, res, next){
@@ -28,11 +28,11 @@ const userController = {
     },
 
     async verifySignUpPhone(req, res, next){
-        let {encryptedOtpToken, otp} = req.body;
+        let {phone, otp} = req.body;
 
-        let resBody = await userServices.verifySignUpPhone(encryptedOtpToken, otp);
+        await userServices.verifySignUpPhone(phone, otp);
 
-        return res.status(200).send(dataResponse("Phone Number has been verified successfully", resBody))
+        return res.status(200).send(dataResponse("Phone Number has been verified successfully"))
     },
 
     async registerAccount(req, res, next){
@@ -57,15 +57,15 @@ const userController = {
     async sendForgotPasswordOtpToEmail(req, res, next){
         let {email} = req.body;
 
-        let resBody = await userServices.sendForgotPasswordOtpToEmail(email);
+        await userServices.sendForgotPasswordOtpToEmail(email);
 
-        return res.status(200).send(dataResponse("Otp has been successfully sent to your email", resBody));
+        return res.status(200).send(dataResponse("Otp has been successfully sent to your email"));
     },
 
     async verifyForgotPasswordEmail(req, res, next){
-        let {encryptedOtpToken, otp} = req.body;
+        let {email, otp} = req.body;
 
-        let resBody = await userServices.verifyForgotPasswordEmail(encryptedOtpToken, otp)
+        let resBody  = await userServices.verifyForgotPasswordEmail(email, otp)
 
         return res.status(200).send(dataResponse("Email has been verified successfully for Reset Password", resBody))
     },
@@ -79,11 +79,11 @@ const userController = {
     },
 
     async registerPetOwnerAccount(req, res, next){
-        let {emailCredentialsToken, phoneCredentialsToken, firstName,
+        let {email, phone, firstName,
             lastName, address, location
         } = req.body;
 
-        let resBody = await userServices.registerPetOwnerAccount(emailCredentialsToken, phoneCredentialsToken, firstName,
+        let resBody = await userServices.registerPetOwnerAccount(email, phone, firstName,
             lastName, address, location);
 
         return res.status(201).send(dataResponse("Account has been created", resBody));

@@ -15,6 +15,7 @@ const __dirname = dirname(__filename);
 
 export class App {
   constructor() {
+    dotenv.config();
     this.app = express();
     this.app.use(express.json());
     this.http = new http.Server(this.app);
@@ -27,7 +28,6 @@ export class App {
   initMiddleware() {
     this.app.use(cors());
     this.app.use(express.json());
-    dotenv.config();
   }
 
   connectToMongoDB() {

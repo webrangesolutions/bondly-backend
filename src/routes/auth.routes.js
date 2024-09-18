@@ -1,6 +1,6 @@
 import express from "express";
 import { bodyValidator } from "../middlewares/bodySchema.middlewares.js";
-import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, sendEmailOTPSchema, sendPhoneOTPSchema, verifyOtpSchema } from "../schemas/authentication.schemas.js";
+import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, sendEmailOTPSchema, sendPhoneOTPSchema, verifyEmailOTPSchema, verifyPhoneOTPSchema } from "../schemas/authentication.schemas.js";
 import { errorHandler } from "../handlers/error.handlers.js";
 import userController from "../controllers/user.controllers.js";
 
@@ -9,25 +9,26 @@ const authRouter = express.Router();
 //-------------Authentication Routes--------------//
 //Sign Up//
 authRouter.post('/signup/sendEmailOTP', 
-                    bodyValidator(sendEmailOTPSchema), 
-                    errorHandler(userController.sendSignupOtpToEmail)
+    bodyValidator(sendEmailOTPSchema), 
+    errorHandler(userController.sendSignupOtpToEmail)
 )
+
 authRouter.post('/signup/verifyEmail', 
-                    bodyValidator(verifyOtpSchema), 
-                    errorHandler(userController.verifySignUpEmail)
+    bodyValidator(verifyEmailOTPSchema), 
+    errorHandler(userController.verifySignUpEmail)
 )
 authRouter.post('/signup/sendPhoneOTP', 
-                    bodyValidator(sendPhoneOTPSchema), 
-                    errorHandler(userController.sendSignupOtpToPhone)
+    bodyValidator(sendPhoneOTPSchema), 
+    errorHandler(userController.sendSignupOtpToPhone)
 )
 authRouter.post('/signup/verifyPhone', 
-                    bodyValidator(verifyOtpSchema), 
-                    errorHandler(userController.verifySignUpPhone)
+    bodyValidator(verifyPhoneOTPSchema), 
+    errorHandler(userController.verifySignUpPhone)
 )
 
 authRouter.post('/signup/registerPetOwnerAccount',
-                    bodyValidator(registerPetOwnerAccountSchema), 
-                    errorHandler(userController.registerPetOwnerAccount)
+    bodyValidator(registerPetOwnerAccountSchema), 
+    errorHandler(userController.registerPetOwnerAccount)
 )
 
 //Create Password//
@@ -41,7 +42,7 @@ authRouter.post('/forgotPassword/sendOTP',
     errorHandler(userController.sendForgotPasswordOtpToEmail)
 )
 authRouter.post('/forgotPassword/VerifyEmail', 
-    bodyValidator(verifyOtpSchema), 
+    bodyValidator(verifyEmailOTPSchema), 
     errorHandler(userController.verifyForgotPasswordEmail)
 )
 //Login//
@@ -50,4 +51,7 @@ authRouter.post('/signin',
     errorHandler(userController.signInAccount)
 )
 
+authRouter.get('/google_url',
+    errorHandler(userController)
+)
 export default authRouter;

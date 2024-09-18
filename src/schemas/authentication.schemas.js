@@ -5,18 +5,25 @@ export const  sendEmailOTPSchema = Joi.object({
     email: emailSchema.required()
 })
 
-export const sendPhoneOTPSchema = Joi.object({
-    phone: phoneSchema
-})
 
-export const verifyOtpSchema = Joi.object({
-    encryptedOtpToken: encryptedOtpTokenSchema.required(),
+export const verifyEmailOTPSchema = Joi.object({
+    email: emailSchema.required(),
     otp: otpSchema.required()
 })
 
+export const sendPhoneOTPSchema = Joi.object({
+    phone: phoneSchema.required()
+})
+
+export const verifyPhoneOTPSchema = Joi.object({
+    phone: phoneSchema.required(),
+    otp: otpSchema.required()
+})
+
+
 export const registerPetOwnerAccountSchema = Joi.object({
-    emailCredentialsToken: Joi.string().min(1).required(),
-    phoneCredentialsToken: Joi.string().min(1).required(),
+    email: emailSchema.required(),
+    phone: phoneSchema.required(),
     firstName: Joi.string().min(1).required(),
     lastName: Joi.string().min(1).required(),
     address: Joi.string().min(1).required(),

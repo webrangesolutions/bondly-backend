@@ -3,11 +3,13 @@ import User from "../models/user.model.js"
 import otpGenerator from "otp-generator";
 import { getForgotPasswordTemplate, getSignupOtpTemplate } from "../email-templates/authentication.templates.js";
 import emailsServices from "./emails.services.js";
-import {createOtpEncryption, verifyOtpToken } from "../utils/otp.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import util from "util";
 import PetOwner from "../models/petOwner.model.js";
+import verifiedCredentialsServices from "./verifiedCredentials.services.js";
+import createHttpError from "http-errors";
+import { createEncryptedJWT, decryptedEJWT } from "../utils/encrypted-payloads.js";
 const userServices = {
     async sendSignupOtpToEmail(email){
         let user = await User.findOne({email});
@@ -15,32 +17,16 @@ const userServices = {
         if(user)
             throw new createError.Conflict("A user with current email already exists")
 
-        let otp = otpGenerator.generate(4, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false })
+        let otp = await verifiedCredentialsServices.assignOtpToEmail(email);
 
         let subject = "OTP for Signing Up to " + process.env.APP_NAME
         let body = getSignupOtpTemplate(otp);
 
         await emailsServices.sendEmail(email, subject, body);
-
-        let encryptedOtpToken = createOtpEncryption({email}, "sign_up", otp);
-
-        return {
-            encryptedOtpToken
-        }
     },
 
-    async verifySignUpEmail(encryptedOtpToken, otp){
-        let decryptedOtpToken = verifyOtpToken(encryptedOtpToken, "sign_up", otp);
-
-        let email = decryptedOtpToken.payload.email;
-
-        let payload = {
-            email
-        };
-
-        let credentialsToken = jwt.sign(payload, process.env.JWT_SIGNUP_SECRET, {expiresIn: process.env.CREDENTIALS_VALID_TIME*60})
-
-        return {credentialsToken};
+    async verifySignUpEmail(email, otp){
+        await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
     },
 
     async sendSignupOtpToPhone(phone){
@@ -49,74 +35,28 @@ const userServices = {
         if(user)
             throw new createError.Conflict("A user with current email already exists")
 
-        let otp = otpGenerator.generate(4, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false })
+        let otp = await verifiedCredentialsServices.assignOtpToPhone(phone);
 
         let message = "Otp for Signing up is " + otp;
 
-        //await emailsServices.sendEmail(email, subject, body); send To Phone Api
-
-        let encryptedOtpToken = createOtpEncryption({phone}, "sign_up", otp);
-
         return {
-            message,
-            encryptedOtpToken
+            message
         }
     },
 
-    async verifySignUpPhone(encryptedOtpToken, otp){
-        let decryptedOtpToken = verifyOtpToken(encryptedOtpToken, "sign_up", otp);
-
-        let phone = decryptedOtpToken.payload.phone;
-
-        let payload = {
-            phone
-        };
-
-        let credentialsToken = jwt.sign(payload, process.env.JWT_SIGNUP_SECRET, {expiresIn: process.env.CREDENTIALS_VALID_TIME*60})
-
-        return {credentialsToken};
-    },
-
-    async registerAccount(emailCredentialsToken, phoneCredentialsToken, firstName,
-    lastName, address, location){
-        let email = null;
-        let phone = null;
-        try{
-            let emailPayload = jwt.verify(emailCredentialsToken, process.env.JWT_SIGNUP_SECRET)
-            let phonePayload = jwt.verify(phoneCredentialsToken, process.env.JWT_SIGNUP_SECRET)
-            email = emailPayload.email;
-            phone = phonePayload.phone;
-        }
-        catch(err){
-            throw new createError.BadRequest(err.message)
-        }
-        
-        let user = new User({
-            email: email,
-            phone,
-            firstName,
-            lastName,
-            address,
-            location,
-
-        })
-
-        await user.save();
-
-        let createPasswordToken = jwt.sign({userId: user._id}, process.env.JWT_CREATE_PASSWORD_SECRET, {expiresIn: process.env.CREDENTIALS_VALID_TIME*60})
-
-        return {createPasswordToken, user}
+    async verifySignUpPhone(phone, otp){    
+        await verifiedCredentialsServices.verifyOtpForPhone(phone, otp);
     },
 
     async createPassword(createPasswordToken, password){
         let userId = null;
 
         try{
-            let createPasswordPayload = jwt.verify(createPasswordToken, process.env.JWT_CREATE_PASSWORD_SECRET);
+            let createPasswordPayload = decryptedEJWT(createPasswordToken, "reset-password");
             userId = createPasswordPayload.userId;
             console.log(createPasswordPayload);
         }
-        catch(e){
+        catch(err){
             throw new createError.BadRequest(err.message)
         }
 
@@ -144,47 +84,38 @@ const userServices = {
         if(!user)
             throw new createError.NotFound("User doesn't exist with given email")
 
-        let otp = otpGenerator.generate(4, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false })
+        let otp = await verifiedCredentialsServices.assignOtpToEmail(email)
 
         let subject = "OTP for Forgeting Password to " + process.env.APP_NAME
         let body = getForgotPasswordTemplate(user.firstName, otp);
 
         await emailsServices.sendEmail(email, subject, body);
-
-        let encryptedOtpToken = createOtpEncryption({userId: user._id}, "forgot_password", otp);
-
-        return {
-            encryptedOtpToken
-        }
     },
 
-    async verifyForgotPasswordEmail(encryptedOtpToken, otp){
-        let decryptedOtpToken = verifyOtpToken(encryptedOtpToken, "forgot_password", otp);
-        console.log(decryptedOtpToken);
-        let userId = decryptedOtpToken.payload.userId;
+    async verifyForgotPasswordEmail(email, otp){
+        await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
         
+        let user = await User.findOne({email});
+
+        if(!user)
+            throw new createHttpError.NotFound("User not found with given email");
+
         let payload = {
-            userId
+            userId:user._id
         };
 
-        let createPasswordToken = jwt.sign(payload, process.env.JWT_CREATE_PASSWORD_SECRET, {expiresIn: process.env.CREDENTIALS_VALID_TIME*60})
+        let createPasswordToken = createEncryptedJWT(payload, "reset-password");
+
+        
 
         return {createPasswordToken};
     },
 
-    async registerPetOwnerAccount(emailCredentialsToken, phoneCredentialsToken, firstName,
+    async registerPetOwnerAccount(email, phone, firstName,
         lastName, address, location){
-        let email = null;
-        let phone = null;
-        try{
-            let emailPayload = jwt.verify(emailCredentialsToken, process.env.JWT_SIGNUP_SECRET)
-            let phonePayload = jwt.verify(phoneCredentialsToken, process.env.JWT_SIGNUP_SECRET)
-            email = emailPayload.email;
-            phone = phonePayload.phone;
-        }
-        catch(err){
-            throw new createError.BadRequest(err.message)
-        }
+        await verifiedCredentialsServices.isEmailVerified(email);
+
+        await verifiedCredentialsServices.isPhoneVerified(phone);
         
         let user = new User({
             email: email,
