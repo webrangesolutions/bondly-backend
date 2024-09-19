@@ -86,8 +86,6 @@ const userServices = {
     async verifyForgotPasswordEmail(email, otp){
         await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
         
-        
-        console.log('here');
 
         let user = await User.findOne({email});
 
@@ -111,7 +109,13 @@ const userServices = {
             roles: ["petOwner"]
         });
 
-        await user.save();
+        await user.save().catch((err)=>{
+            if (err.code === 11000) {
+                throw new createHttpError.BadRequest("User already exists with given credentials");
+            } else {
+                throw err
+            }
+        });
 
         let petOwner = new PetOwner({
             user: user._id,
