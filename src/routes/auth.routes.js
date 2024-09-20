@@ -4,6 +4,7 @@ import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, sendE
 import { errorHandler } from "../handlers/error.handlers.js";
 import userController from "../controllers/user.controllers.js";
 import passport from "passport";
+import { OAuth2Client } from "google-auth-library";
 
 const authRouter = express.Router();
 
@@ -57,10 +58,29 @@ authRouter.get('/google',
         [ 'email', 'profile' ] }
 ));
 
-authRouter.get( '/google/callback',
-    (req, res, next)=>{
-        return res.status(200).send({req});
-    }
+authRouter.get( '/google/callback',async (req, res) => {
+  const code = req.query.code;
+  let oAuth2Client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
+  if (!code) {
+    return res.status(400).send('Authorization code not found');
+  }
+
+  try {
+    // Exchange authorization code for access token
+    const { tokens } = await oAuth2Client.getToken(code);
+    
+    // Set tokens on the OAuth2 client
+    oAuth2Client.setCredentials(tokens);
+    console.log(tokens);
+    // Print the ID token to the console
+    console.log('ID Token:', tokens.id_token);
+
+    // Show the ID token to the user in the browser
+    res.send(`<h1>ID Token</h1><p>${tokens.id_token}</p>`);
+  } catch (error) {
+    res.status(500).send('Error during authentication');
+  }
+}
 );
 
 authRouter.get('/verifyGoogleToken',
