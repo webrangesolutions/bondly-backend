@@ -1,9 +1,16 @@
+import { OAuth2Client } from "google-auth-library";
 
 
 const thirdPartyAuthServices = {
-    async SignupWithGoogle(id, accessToken){
-        const oauthClient = new OAuth();
-        
+    async verifyGoogleToken(accessToken){
+        let client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const ticket = await client.verifyIdToken({
+            idToken: accessToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+          });
+        const payload = ticket.getPayload();
+
+       return {payload} 
         // try {
         //     const response = await oauthClient.verifyIdToken({
         //         idToken,

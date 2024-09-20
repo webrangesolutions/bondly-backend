@@ -98,10 +98,10 @@ const userController = {
         return res.status(200).send(dataResponse("Profile has been retrieved successfully", resBody))
     },
 
-    async SignupWithGoogle(req, res, next){
-        let {id, accessToken} = req.body;
+    async verifyGoogleToken(req, res, next){
+        let {accessToken} = req.body;
 
-        let resBody = await thirdPartyAuthServices.SignupWithGoogle(id, accessToken);
+        let resBody = await thirdPartyAuthServices.verifyGoogleToken(accessToken);
 
         return res.status(200).send(dataResponse("Signup", resBody))
     },

@@ -67,6 +67,10 @@ authRouter.get( '/google/callback',
     }
 );
 
+authRouter.get('/verifyGoogleToken',
+    errorHandler(userController.verifyGoogleToken)
+)
+
 authRouter.get('/google/success', (req, res)=>{
     return res.status(200).send(req.body);
 })

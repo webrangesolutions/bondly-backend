@@ -41,7 +41,7 @@ export class App {
     async (request, accessToken, refreshToken, profile, done) => {
       try {
         // Here you can check if the user exists in your database
-        console.log(profile);
+        console.log(request, accessToken, refreshToken, profile);
         // For example: const user = await User.findOrCreate({ googleId: profile.id });
         const user = { id: profile.id, displayName: profile.displayName, accessToken:accessToken }; // Example user object
         return done(null, user); // Pass user to serializeUser
