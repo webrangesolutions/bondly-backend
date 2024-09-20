@@ -58,12 +58,8 @@ authRouter.get('/google',
 ));
 
 authRouter.get( '/google/callback',
-    passport.authenticate( 'google', {
-        failureRedirect: '/auth/google/failure'
-    }),
     (req, res, next)=>{
-        console.log('body', req.body);
-        return res.status(200).send(req.user);
+        return res.status(200).send({req});
     }
 );
 
