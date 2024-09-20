@@ -1,6 +1,7 @@
-// config/firebase.js
-const admin = require('firebase-admin');
-const dotenv = require('dotenv');
+
+import admin from "firebase-admin";
+import dotenv from "dotenv";
+
 dotenv.config();
 
 const serviceAccount = {

@@ -62,13 +62,12 @@ authRouter.get( '/google/callback',
         failureRedirect: '/auth/google/failure'
     }),
     (req, res, next)=>{
+        console.log('body', req.body);
         return res.status(200).send(req.user);
     }
 );
 
 authRouter.get('/google/success', (req, res)=>{
-    console.log(req, res);
-
     return res.status(200).send(req.body);
 })
 export default authRouter;

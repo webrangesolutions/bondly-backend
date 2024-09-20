@@ -1,4 +1,5 @@
 import petOwnerServices from "../services/petOwner.services.js";
+import thirdPartyAuthServices from "../services/thirdPartyAuth.services.js";
 import userServices from "../services/user.services.js";
 import { dataResponse } from "../utils/responses.js";
 
@@ -95,6 +96,22 @@ const userController = {
         let resBody = await userServices.getMyProfile(userId);
 
         return res.status(200).send(dataResponse("Profile has been retrieved successfully", resBody))
+    },
+
+    async SignupWithGoogle(req, res, next){
+        let {id, accessToken} = req.body;
+
+        let resBody = await thirdPartyAuthServices.SignupWithGoogle(id, accessToken);
+
+        return res.status(200).send(dataResponse("Signup", resBody))
+    },
+
+    async SignupWithApple(req, res, next){
+        let {id, accessToken} = req.body;
+
+        let resBody = await  thirdPartyAuthServices.SignupWithApple(id, accessToken);
+
+        return res.status(200).send(dataResponse("Signup", resBody))
     }
 }
 

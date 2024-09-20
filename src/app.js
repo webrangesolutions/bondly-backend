@@ -43,7 +43,7 @@ export class App {
         // Here you can check if the user exists in your database
         console.log(profile);
         // For example: const user = await User.findOrCreate({ googleId: profile.id });
-        const user = { id: profile.id, displayName: profile.displayName }; // Example user object
+        const user = { id: profile.id, displayName: profile.displayName, accessToken:accessToken }; // Example user object
         return done(null, user); // Pass user to serializeUser
       } catch (error) {
         return done(error, null); // Handle errors
