@@ -36,6 +36,20 @@ const verifiedCredentialsServices = {
         await verifiedCredential.save();
     },
 
+    async verifyEmail(email){
+        let verifiedCredential = await VerifiedCredential.findOne({email});
+
+        if(!verifiedCredential)
+        {
+            verifiedCredential = new VerifiedCredential({email, verified: true});
+        }
+        else{
+            verifiedCredential.verified = true;
+        }
+
+        await verifiedCredential.save();
+    },
+
     async isEmailVerified(email){
         let verifiedCredential = await VerifiedCredential.findOne({email, verified: true});
 

@@ -99,17 +99,17 @@ const userController = {
     },
 
     async verifyGoogleToken(req, res, next){
-        let {accessToken} = req.body;
+        let {idToken} = req.body;
 
-        let resBody = await thirdPartyAuthServices.verifyGoogleToken(accessToken);
+        let {message, resBody} = await thirdPartyAuthServices.verifyGoogleToken(idToken);
 
-        return res.status(200).send(dataResponse("Signup", resBody))
+        return res.status(200).send(dataResponse(message, resBody))
     },
 
-    async SignupWithApple(req, res, next){
-        let {id, accessToken} = req.body;
+    async verifyAppleToken(req, res, next){
+        let {idToken} = req.body;
 
-        let resBody = await  thirdPartyAuthServices.SignupWithApple(id, accessToken);
+        let resBody = await  thirdPartyAuthServices.verifyAppleToken(idToken);
 
         return res.status(200).send(dataResponse("Signup", resBody))
     }

@@ -1,41 +1,57 @@
 import { OAuth2Client } from "google-auth-library";
+import User from "../models/user.model.js";
+import userServices from "./user.services.js";
+import verifiedCredentialsServices from "./verifiedCredentials.services.js";
 
 
 const thirdPartyAuthServices = {
-    async verifyGoogleToken(accessToken){
-        let client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
-        const {token} = await client.getToken(accessToken);
+    async verifyGoogleToken(idToken){
+        let client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
         const ticket = await client.verifyIdToken({
-            idToken: token,
+            idToken: idToken,
             audience: process.env.GOOGLE_CLIENT_ID,
-          });
-          
+        });
+
         const payload = ticket.getPayload();
+        
+        //Check if User Already Exists//
+        let user = await User.findOne({email: payload.email})
+        let resBody = null;
+        let message = null;
+        if(!user)
+        {
+            await verifiedCredentialsServices.verifyEmail(payload.email);
+            message = "Email has been verified successfully";
+            resBody = {email: payload.email};
+        }
+        else{
+            resBody = await userServices.getUserPayload(user);
+            message = "User has logged in successfully";
+        }
 
-       return {payload} 
-        // try {
-        //     const response = await oauthClient.verifyIdToken({
-        //         idToken,
-        //         audience: [
-        //             // Add your android & apple client_id here
-        //         ],
-        //     });
-        //     const payload = response.getPayload();
-
-        //     if (payload) {
-        //         const { email, name } = payload;
-
-        //         return await this.logInOrRegister(email, name);
-        //     } else {
-        //         console.log('token is invalid!');
-        //     }
-        // } catch (e) {
-        //     console.log('error', e);
-        // }
+       return {message, resBody};
     },
 
-    async SignupWithApple(id, accessToken){
+    async verifyAppleToken(idToken){
+        const decodedToken = jwt.verify(idToken, process.env.APPLE_PUBLIC_KEY, { algorithms: ['ES256'] });
 
+        //Check if User Already Exists//
+        let user = await User.findOne({email: decodedToken.email})
+        let resBody = null;
+        let message = null;
+        if(!user)
+        {
+            await verifiedCredentialsServices.verifyEmail(decodedToken.email);
+            message = "Email has been verified successfully";
+            resBody = {email: decodedToken.email};
+        }
+        else{
+            resBody = await userServices.getUserPayload(user);
+            message = "User has logged in successfully";
+        }
+
+       return {message, resBody};
     }
 }
 

@@ -170,6 +170,32 @@ const userServices = {
         if(!passwordMatched)
             throw new createError.Unauthorized("Password doesn't match");
 
+        let resBody = await this.getUserPayload(user);
+
+        return resBody
+    },
+
+    async getMyProfile(userId){
+        let user = await User.findById(userId);
+
+        if(!user)
+            throw new createError.NotFound("User doesn't exist found");
+
+        let resBody = {
+            user
+        }
+
+        if(user.roles.includes("petOwner")){
+            let petOwner = await PetOwner.findOne({user: userId});
+            resBody.petOwner = petOwner;
+        }
+
+        //Implement pet Carer Logic Here//
+
+        return resBody
+    },
+
+    async getUserPayload(user){
         let payload = {
             user: user._id,
             roles: ["user"]
@@ -193,27 +219,7 @@ const userServices = {
         let authToken = jwt.sign(payload, process.env.JWT_AUTHENTICATION_SECRET);
         resBody.authToken = authToken;
 
-        return resBody
-    },
-
-    async getMyProfile(userId){
-        let user = await User.findById(userId);
-
-        if(!user)
-            throw new createError.NotFound("User doesn't exist found");
-
-        let resBody = {
-            user
-        }
-
-        if(user.roles.includes("petOwner")){
-            let petOwner = await PetOwner.findOne({user: userId});
-            resBody.petOwner = petOwner;
-        }
-
-        //Implement pet Carer Logic Here//
-
-        return resBody
+        return resBody;
     }
 }
 

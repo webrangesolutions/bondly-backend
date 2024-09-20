@@ -4,7 +4,7 @@ import createError from "http-errors";
 
 const petOwnerRepository = {
     async getSpecificPetOwner(id){
-        const petOwnerId = new mongoose.Types.ObjectId(id);
+        const petOwnerId = new mongoose.Schema.Types.ObjectId(id);
         
         const pipeline = [
         {

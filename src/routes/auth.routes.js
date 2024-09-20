@@ -53,6 +53,17 @@ authRouter.post('/signin',
     errorHandler(userController.signInAccount)
 )
 
+authRouter.post('/verifyGoogleToken',
+    errorHandler(userController.verifyGoogleToken)
+)
+
+authRouter.post('/verifyAppleToken',
+    errorHandler(userController.verifyGoogleToken)
+)
+
+//Following Code is for Testing Purpose Only for getting idToken on browser//
+//Authentication on Browser is a bit different//
+//Callback Function is changed//
 authRouter.get('/google',
     passport.authenticate('google', { scope:
         [ 'email', 'profile' ] }
@@ -83,11 +94,4 @@ authRouter.get( '/google/callback',async (req, res) => {
 }
 );
 
-authRouter.get('/verifyGoogleToken',
-    errorHandler(userController.verifyGoogleToken)
-)
-
-authRouter.get('/google/success', (req, res)=>{
-    return res.status(200).send(req.body);
-})
 export default authRouter;
