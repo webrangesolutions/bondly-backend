@@ -96,7 +96,7 @@ const userServices = {
     },
 
     async registerPetOwnerAccount(email, phone, firstName,
-        lastName, address, location){
+        lastName, address, location, dob){
         await verifiedCredentialsServices.isEmailVerified(email);
 
         await verifiedCredentialsServices.isPhoneVerified(phone)
@@ -106,7 +106,8 @@ const userServices = {
             phone,
             firstName,
             lastName,
-            roles: ["petOwner"]
+            roles: ["petOwner"],
+            dob
         });
 
         await user.save().catch((err)=>{

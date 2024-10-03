@@ -81,11 +81,11 @@ const userController = {
 
     async registerPetOwnerAccount(req, res, next){
         let {email, phone, firstName,
-            lastName, address, location
+            lastName, dob, address, location
         } = req.body;
 
         let resBody = await userServices.registerPetOwnerAccount(email, phone, firstName,
-            lastName, address, location);
+            lastName, address, location, dob);
 
         return res.status(201).send(dataResponse("Account has been created", resBody));
     },

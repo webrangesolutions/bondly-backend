@@ -27,7 +27,8 @@ export const registerPetOwnerAccountSchema = Joi.object({
     firstName: Joi.string().min(1).required(),
     lastName: Joi.string().min(1).required(),
     address: Joi.string().min(1).required(),
-    location: locationSchema.required()
+    location: locationSchema.required(),
+    dob: Joi.date().required()
 })
 
 export const createPasswordSchema = Joi.object({

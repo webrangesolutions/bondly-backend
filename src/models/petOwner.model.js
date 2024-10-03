@@ -12,6 +12,10 @@ const PetOwnerSchema = new Schema({
     type: String,
     required: true
   },
+  emergencyNumber: {
+    type: String,
+    default: null
+  },
   location: {
     lat: {
       type: Number,

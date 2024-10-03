@@ -4,7 +4,7 @@ import createError from "http-errors";
 
 const petOwnerRepository = {
     async getSpecificPetOwner(id){
-        const petOwnerId = new mongoose.Schema.Types.ObjectId(id);
+        const petOwnerId = new mongoose.Types.ObjectId(id);
         
         const pipeline = [
         {
@@ -38,7 +38,7 @@ const petOwnerRepository = {
         ];
         
         let petOwners = await PetOwner.aggregate(pipeline);
-
+        
         if(petOwners.length < 1)
             throw new createError.NotFound("Pet Owner doesn't exist");
         

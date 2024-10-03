@@ -20,6 +20,14 @@ const UserSchema = new Schema({
       match: [/^\d+$/, 'Please enter a valid phone number']
     }
   },
+  profileImageUrl:{
+    type: String,
+    default: null
+  },
+  dob:{
+    type: Date,
+    required: true
+  },
   firstName: {
     type: String,
     required: true
