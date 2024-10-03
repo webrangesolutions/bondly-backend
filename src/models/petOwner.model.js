@@ -25,6 +25,15 @@ const PetOwnerSchema = new Schema({
       type: Number,
       required: true
     }
+  },
+  pets: {
+    type: [
+      {
+        type: Schema.ObjectId,
+        ref: "Pet"
+      }
+    ],
+    default: []
   }
 });
 
