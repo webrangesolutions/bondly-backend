@@ -1,6 +1,6 @@
 import express from "express";
 import { bodyValidator } from "../middlewares/bodySchema.middlewares.js";
-import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, sendEmailOTPSchema, sendPhoneOTPSchema, verifyEmailOTPSchema, verifyPhoneOTPSchema } from "../schemas/authentication.schemas.js";
+import { createPasswordSchema, loginSchema, registerPetOwnerAccountSchema, registerUserAccountSchema, sendEmailOTPSchema, sendPhoneOTPSchema, verifyEmailOTPSchema, verifyPhoneOTPSchema,verifyOtpSchema,sendOtpSchema } from "../schemas/authentication.schemas.js";
 import { errorHandler } from "../handlers/error.handlers.js";
 import userController from "../controllers/user.controllers.js";
 import passport from "passport";
@@ -27,10 +27,24 @@ authRouter.post('/signup/verifyPhone',
     bodyValidator(verifyPhoneOTPSchema), 
     errorHandler(userController.verifySignUpPhone)
 )
+//routes by sameem
+authRouter.post('/signup/sendOtp',
+    bodyValidator(sendOtpSchema),
+    errorHandler(userController.sendSignupOtp)
+);
 
+authRouter.post('/signup/verifyOtp',
+    bodyValidator(verifyOtpSchema),
+    errorHandler(userController.verifySignupContact)
+);
+//
 authRouter.post('/signup/registerPetOwnerAccount',
     bodyValidator(registerPetOwnerAccountSchema), 
     errorHandler(userController.registerPetOwnerAccount)
+)
+authRouter.post('/signup/user',
+    bodyValidator(registerUserAccountSchema),
+    errorHandler(userController.registerUserAccount)
 )
 
 //Create Password//

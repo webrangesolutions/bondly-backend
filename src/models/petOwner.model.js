@@ -37,6 +37,6 @@ const PetOwnerSchema = new Schema({
   }
 });
 
-let PetOwner = mongoose.model('PetOwner', PetOwnerSchema);
+let PetOwner = mongoose.model('PetOwner', PetOwnerSchema); 
 
 export default PetOwner
