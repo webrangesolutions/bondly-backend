@@ -12,7 +12,7 @@ const petCarerServices = {
         return { petCarer }
     },
     async updateSpecificPetCarer(petCarerId, firstName, lastName, dob,
-        locationLat, locationLng, locationName, profileImage, motivation, languageSpoken, biologicalGender) {
+        location, profileImage, motivation, languageSpoken, biologicalGender) {
 
         // Getting Pet Carer and User
         let petCarer = await PetCarer.findById(petCarerId);
@@ -23,9 +23,6 @@ const petCarerServices = {
             biologicalGender,
             lastName,
             dob,
-            locationLat,
-            locationLng,
-            locationName,
             languageSpoken,
             motivation
         });
@@ -46,9 +43,9 @@ const petCarerServices = {
         if (dob) user.dob = dob;
 
         // Updating Pet Carer
-        if (locationLat) petCarer.location.lat = locationLat;
-        if (locationLng) petCarer.location.lng = locationLng;
-        if (locationName) petCarer.location.name = locationName;
+        if (location.lat) petCarer.location.lat = location.lat;
+        if (location.lng) petCarer.location.lng = location.lng;
+        if (location.name) petCarer.location.name = location.name;
         if (biologicalGender) petCarer.biologicalGender = biologicalGender;
         if (languageSpoken) petCarer.languageSpoken = Array.isArray(languageSpoken) ? languageSpoken : [languageSpoken];
         if (motivation) petCarer.motivation = motivation;

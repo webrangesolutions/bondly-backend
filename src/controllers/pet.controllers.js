@@ -30,7 +30,7 @@ const petController = {
             let petCarerId = req.petCarer;
 
             // Retrieve files
-            let image = req.files['image'] ? req.files['image'][0] : null;
+            let images = req.files['images'] || [];
             // console.log(image,"images"); 
             let homePictures = req.files['homePictures'] || [];
 
@@ -60,17 +60,17 @@ const petController = {
             }
 
             let {
-                homeType, floor, elevatorAvailable, locationLat, locationLng, locationName, motivation, transportationMethod,
-                dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets 
+                homeType, floor, elevatorAvailable, location, motivation, transportationMethod,
+                dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets
             } = req.body;
             let resBody = await petServices.addPetByPetCarer(
-                petCarerId, homeType, floor, elevatorAvailable, homePictures, locationLat, locationLng, locationName, motivation, transportationMethod, dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets, image, petsData
+                petCarerId, homeType, floor, elevatorAvailable, homePictures, location, motivation, transportationMethod, dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets, images, petsData
             );
 
             return res.status(201).send(dataResponse("Pet(s) have been added.", resBody));
 
         } catch (error) {
-            next(error); 
+            next(error);
         }
     }
     ,

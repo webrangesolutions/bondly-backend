@@ -131,7 +131,7 @@ const userServices = {
     },
 
     async registerUserAccount(email, phone, firstName,
-        lastName, locationLat, locationLng, locationName, dob) {
+        lastName, location, dob) {
         await verifiedCredentialsServices.isEmailVerified(email);
 
         await verifiedCredentialsServices.isPhoneVerified(phone)
@@ -155,14 +155,14 @@ const userServices = {
         let petCarer = new PetCarer({
             user: user._id,
             location: {
-                lat: locationLat,
-                lng:  locationLng,
-                name:  locationName
+                lat: location.lat,
+                lng: location.lng,
+                name: location.name
             }
         });
         await petCarer.save().catch((err) => {
             throw new createHttpError.InternalServerError("Failed to create Pet Carer");
-        }); 
+        });
 
         return { user, petCarer }
     },

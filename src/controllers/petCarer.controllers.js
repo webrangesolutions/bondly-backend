@@ -16,12 +16,12 @@ const petCarerController = {
 
         let profileImage = req.file;
 
-        let { firstName, lastName, locationLat, locationLng, locationName, dob, motivation, languageSpoken, biologicalGender } = req.body;
+        let { firstName, lastName, location, dob, motivation, languageSpoken, biologicalGender } = req.body;
         let resBody = await petCarerServices.updateSpecificPetCarer(petCarerId, firstName, lastName, dob,
-            locationLat, locationLng, locationName, profileImage, motivation, languageSpoken, biologicalGender);
+            location, profileImage, motivation, languageSpoken, biologicalGender);
 
         return res.status(200).send(dataResponse("Your Pet Owner Profile has been updated", resBody));
     }
-}  
+}
 
 export default petCarerController; 

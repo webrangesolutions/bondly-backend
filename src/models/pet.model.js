@@ -6,7 +6,7 @@ const PetSchema = new Schema({
   user: {
     type: Schema.ObjectId,
     ref: "User",
-    unique: true,
+    // unique: true,
     // required: true
   },
   petOwner: { //If We need to show that Pet Carer also owns pets, then refer User Id here instead.
@@ -28,12 +28,12 @@ const PetSchema = new Schema({
   },
   breed: {
     type: String,
-    // required: true
+
   },
   gender: {
     type: String,
     enum: ['Male', 'Female'],
-    required: true
+
   },
   physicalAttributes: {
     type: String,

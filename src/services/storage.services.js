@@ -6,7 +6,7 @@ export async function uploadFileToFirebase(filePath, fileName, file) {
         if (!file) {
             throw new createHttpError.BadRequest("File doesn't exist");
         }
-
+        console.log(file.originalname)
         // Create a unique file name in Firebase storage
         let fileExtension = file.originalname.split(".").pop();
         const blob = bucket.file(`${filePath}/${fileName}.${fileExtension}`);
@@ -37,4 +37,3 @@ export async function uploadFileToFirebase(filePath, fileName, file) {
         throw new createHttpError.InternalServerError(error.message);
     }
 }
-  

@@ -66,15 +66,15 @@ const PetCarerSchema = new Schema({
         type: Boolean,
         default: false
     },
-    pets: {
-        type: [
-            {
-                type: Schema.ObjectId,
-                ref: "Pet"
-            }
-        ],
-        default: []
-    },
+    // pets: {
+    //     type: [
+    //         {
+    //             type: Schema.ObjectId,
+    //             ref: "Pet"
+    //         }
+    //     ],
+    //     default: []
+    // },
     isActive: {
         type: Boolean,
         default: true

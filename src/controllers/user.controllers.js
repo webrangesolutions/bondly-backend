@@ -128,11 +128,11 @@ const userController = {
     },
     async registerUserAccount(req, res, next) {
         let { email, phone, firstName,
-            lastName, dob, locationLat, locationLng, locationName
+            lastName, dob, location
         } = req.body;
 
         let resBody = await userServices.registerUserAccount(email, phone, firstName,
-            lastName, locationLat, locationLng, locationName, dob);
+            lastName, location, dob);
 
         return res.status(201).send(dataResponse("Account has been created", resBody));
     },

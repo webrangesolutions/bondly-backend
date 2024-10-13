@@ -37,7 +37,7 @@ const petServices = {
     },
 
     async addPetByPetCarer(
-        petCarerId, homeType, floor, elevatorAvailable, homePictures, locationLat, locationLng, locationName, motivation, transportationMethod, dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets, image, petsData
+        petCarerId, homeType, floor, elevatorAvailable, homePictures, location, motivation, transportationMethod, dropIns, dayPetSitting, overnightPetSitting, meetAndGreet, havePets, images, petsData
     ) {
 
         // Find the existing Pet Carer
@@ -65,9 +65,9 @@ const petServices = {
         petCarer.floor = floor || petCarer.floor;
         petCarer.elevatorAvailable = elevatorAvailable || petCarer.elevatorAvailable;
         petCarer.location = {
-            lat: locationLat || petCarer.location.lat,
-            lng: locationLng || petCarer.location.lng,
-            name: locationName || petCarer.location.name,
+            lat: location.lat || petCarer.location.lat,
+            lng: location.lng || petCarer.location.lng,
+            name: location.name || petCarer.location.name,
         };
         petCarer.motivation = motivation || petCarer.motivation;
         petCarer.transportationMethod = transportationMethod || petCarer.transportationMethod;
@@ -81,9 +81,9 @@ const petServices = {
         petCarer.homePictures = homePictureUrls;
         if (havePets) {
 
-            const petPromises = petsData.map(async (petData) => {
+            const petPromises = petsData.map(async (petData, index) => {
                 let { type, name, gender, spayedOrCastrated, dob, hobbies, fearsAndTriggers, animalClass, aboutYourPet } = petData;
-                    
+
                 const pet = new Pet({
                     user: petCarerId,
                     type,
@@ -98,13 +98,13 @@ const petServices = {
                 });
 
                 // Upload pet profile image
-                pet.imageUrl = await uploadFileToFirebase(`pets/${pet._id}`, "profile", image);
+                pet.imageUrl = await uploadFileToFirebase(`pets/${pet._id}`, "profile", images[index]);
                 await pet.save();
                 return pet._id;
             });
 
             const petIds = await Promise.all(petPromises);
-            petCarer.pets.push(...petIds);
+            // petCarer.pets.push(...petIds);
         }
 
         await petCarer.save();
