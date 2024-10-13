@@ -158,7 +158,8 @@ const userServices = {
                 lat: location.lat,
                 lng: location.lng,
                 name: location.name
-            }
+            },
+            createdBy: user._id
         });
         await petCarer.save().catch((err) => {
             throw new createHttpError.InternalServerError("Failed to create Pet Carer");

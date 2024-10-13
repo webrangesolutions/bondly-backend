@@ -49,7 +49,7 @@ const petCarerServices = {
         if (biologicalGender) petCarer.biologicalGender = biologicalGender;
         if (languageSpoken) petCarer.languageSpoken = Array.isArray(languageSpoken) ? languageSpoken : [languageSpoken];
         if (motivation) petCarer.motivation = motivation;
-
+        petCarer.updatedBy = user._id;
         await petCarer.save();
         await user.save();
 

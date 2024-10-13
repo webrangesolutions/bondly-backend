@@ -99,6 +99,7 @@ const petServices = {
 
                 // Upload pet profile image
                 pet.imageUrl = await uploadFileToFirebase(`pets/${pet._id}`, "profile", images[index]);
+                pet.createdBy = petCarerId;
                 await pet.save();
                 return pet._id;
             });
@@ -106,7 +107,7 @@ const petServices = {
             const petIds = await Promise.all(petPromises);
             // petCarer.pets.push(...petIds);
         }
-
+        petCarer.updatedBy = petCarerId;
         await petCarer.save();
 
         return { petCarer, pets: petCarer.pets };
