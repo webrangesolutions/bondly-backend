@@ -10,11 +10,12 @@ import PetOwner from "../models/petOwner.model.js";
 import verifiedCredentialsServices from "./verifiedCredentials.services.js";
 import createHttpError from "http-errors";
 import { createEncryptedJWT, decryptedEJWT } from "../utils/encrypted-payloads.js";
+import PetCarer from "../models/petCarer.model.js";
 const userServices = {
-    async sendSignupOtpToEmail(email){
-        let user = await User.findOne({email});
-        
-        if(user)
+    async sendSignupOtpToEmail(email) {
+        let user = await User.findOne({ email });
+
+        if (user)
             throw new createError.Conflict("A user with current email already exists")
 
         let otp = await verifiedCredentialsServices.assignOtpToEmail(email);
@@ -25,14 +26,14 @@ const userServices = {
         await emailsServices.sendEmail(email, subject, body);
     },
 
-    async verifySignUpEmail(email, otp){
+    async verifySignUpEmail(email, otp) {
         await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
     },
 
-    async sendSignupOtpToPhone(phone){
-        let user = await User.findOne({phone});
-        
-        if(user)
+    async sendSignupOtpToPhone(phone) {
+        let user = await User.findOne({ phone });
+
+        if (user)
             throw new createError.Conflict("A user with current email already exists")
 
         let otp = await verifiedCredentialsServices.assignOtpToPhone(phone);
@@ -44,16 +45,16 @@ const userServices = {
         }
     },
 
-    async verifySignUpPhone(phone, otp){    
+    async verifySignUpPhone(phone, otp) {
         await verifiedCredentialsServices.verifyOtpForPhone(phone, otp);
     },
 
-    async createPassword(email, password){
+    async createPassword(email, password) {
         await verifiedCredentialsServices.isEmailVerified(email);
-        
-        let user = await User.findOne({email});
 
-        if(!user)
+        let user = await User.findOne({ email });
+
+        if (!user)
             throw new createError.NotFound("User not found with given email id.");
 
         let salt = await bcrypt.genSalt(10);
@@ -63,16 +64,16 @@ const userServices = {
         let encryptedPassword = await hashPassword(password, salt);
 
         user.password = encryptedPassword;
-        
+
         await user.save();
 
-        return {user}
+        return { user }
     },
 
-    async sendForgotPasswordOtpToEmail(email){
-        let user = await User.findOne({email});
-        
-        if(!user)
+    async sendForgotPasswordOtpToEmail(email) {
+        let user = await User.findOne({ email });
+
+        if (!user)
             throw new createError.NotFound("User doesn't exist with given email")
 
         let otp = await verifiedCredentialsServices.assignOtpToEmail(email)
@@ -83,20 +84,20 @@ const userServices = {
         await emailsServices.sendEmail(email, subject, body);
     },
 
-    async verifyForgotPasswordEmail(email, otp){
+    async verifyForgotPasswordEmail(email, otp) {
         await verifiedCredentialsServices.verifyOtpForEmail(email, otp);
-        
 
-        let user = await User.findOne({email});
 
-        if(!user)
+        let user = await User.findOne({ email });
+
+        if (!user)
             throw new createHttpError.NotFound("User not found with given email");
 
 
     },
 
     async registerPetOwnerAccount(email, phone, firstName,
-        lastName, address, location, dob){
+        lastName, address, location, dob) {
         await verifiedCredentialsServices.isEmailVerified(email);
 
         await verifiedCredentialsServices.isPhoneVerified(phone)
@@ -110,7 +111,7 @@ const userServices = {
             dob
         });
 
-        await user.save().catch((err)=>{
+        await user.save().catch((err) => {
             if (err.code === 11000) {
                 throw new createHttpError.BadRequest("User already exists with given credentials");
             } else {
@@ -126,49 +127,84 @@ const userServices = {
 
         await petOwner.save();
 
-        return {user, petOwner}
+        return { user, petOwner }
     },
 
-    async registerPetCarerAccount(){
-        //Not Implemented//
+    async registerUserAccount(email, phone, firstName,
+        lastName, location, dob) {
+        await verifiedCredentialsServices.isEmailVerified(email);
+
+        await verifiedCredentialsServices.isPhoneVerified(phone)
+
+        let user = new User({
+            email: email,
+            phone,
+            firstName,
+            lastName,
+            roles: ["petCarer"],
+            dob
+        });
+
+        await user.save().catch((err) => {
+            if (err.code === 11000) {
+                throw new createHttpError.BadRequest("User already exists with given credentials");
+            } else {
+                throw err
+            }
+        });
+        let petCarer = new PetCarer({
+            user: user._id,
+            location: {
+                lat: location.lat,
+                lng: location.lng,
+                name: location.name
+            },
+            createdBy: user._id
+        });
+        await petCarer.save().catch((err) => {
+            throw new createHttpError.InternalServerError("Failed to create Pet Carer");
+        });
+
+        return { user, petCarer }
     },
 
-    async getUserProfile(userId){
+    async getUserProfile(userId) {
         let user = await User.findById(userId);
 
-        if(!user)
+        if (!user)
             throw new createError.NotFound("User with given information doesn't exist");
 
         let resBody = {
             user
         }
 
-        if(user.roles.findIndex((val)=>val=="petOwner")>-1){
-            let petOwner = await PetOwner.findOne({user: user._id});
+        if (user.roles.findIndex((val) => val == "petOwner") > -1) {
+            let petOwner = await PetOwner.findOne({ user: user._id });
             resBody.petOwner = petOwner;
         }
 
-        if(user.roles.findIndex((val)=>val=="petCarer")>-1){
-            //Not Implemented Yet
+        if (user.roles.findIndex((val) => val == "petCarer") > -1) {
+            let petCarer = await PetCarer.findOne({ user: user._id });
+            resBody.petCarer = petCarer;
         }
 
         return resBody
     },
 
-    async signInAccount(email, password){
-        let user = await User.findOne({email});
+    async signInAccount(email, password) {
+        let user = await User.findOne({ email });
 
-        if(!user)
+        if (!user)
             throw new createError.NotFound("User with given information doesn't exist");
 
-        if(!user.password)
+        if (!user.password)
             throw new createError.BadRequest("User's password is not set, please create one first");
 
-        let passwordMatched = await bcrypt.compare(password, user.password).catch((err)=>{
+        let passwordMatched = await bcrypt.compare(password, user.password).catch((err) => {
             throw new createError.BadRequest(err.message);
         })
 
-        if(!passwordMatched)
+        if (!passwordMatched)
             throw new createError.Unauthorized("Password doesn't match");
 
         let resBody = await this.getUserPayload(user);
@@ -176,27 +212,30 @@ const userServices = {
         return resBody
     },
 
-    async getMyProfile(userId){
+    async getMyProfile(userId) {
         let user = await User.findById(userId);
 
-        if(!user)
+        if (!user)
             throw new createError.NotFound("User doesn't exist found");
 
         let resBody = {
             user
         }
 
-        if(user.roles.includes("petOwner")){
-            let petOwner = await PetOwner.findOne({user: userId});
+        if (user.roles.includes("petOwner")) {
+            let petOwner = await PetOwner.findOne({ user: userId });
             resBody.petOwner = petOwner;
         }
 
-        //Implement pet Carer Logic Here//
+        if (user.roles.includes("petCarer")) {
+            let petCarer = await PetCarer.findOne({ user: userId });
+            resBody.petCarer = petCarer;
+        }
 
         return resBody
     },
 
-    async getUserPayload(user){
+    async getUserPayload(user) {
         let payload = {
             user: user._id,
             roles: ["user"]
@@ -206,15 +245,18 @@ const userServices = {
             user
         }
 
-        if(user.roles.findIndex((val)=>val=="petOwner")>-1){
-            let petOwner = await PetOwner.findOne({user: user._id});
+        if (user.roles.findIndex((val) => val == "petOwner") > -1) {
+            let petOwner = await PetOwner.findOne({ user: user._id });
             resBody.petOwner = petOwner;
             payload.petOwner = petOwner._id;
             payload.roles.push("petOwner")
         }
 
-        if(user.roles.findIndex((val)=>val=="petCarer")>-1){
-            //Not Implemented Yet
+        if (user.roles.findIndex((val) => val == "petCarer") > -1) {
+            let petCarer = await PetCarer.findOne({ user: user._id });
+            resBody.petCarer = petCarer;
+            payload.petCarer = petCarer._id;
+            payload.roles.push("petCarer")
         }
 
         let authToken = jwt.sign(payload, process.env.JWT_AUTHENTICATION_SECRET);

@@ -5,4 +5,9 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-export {upload}
+// For multiple files: array and single combined
+const multipleUploads = upload.fields([
+    { name: "images", maxCount: 999 },
+    { name: "homePictures", maxCount: 999 },
+]);
+export { upload, multipleUploads }

@@ -76,7 +76,6 @@ const verifiedCredentialsServices = {
     },
 
     async verifyOtpForPhone(phone, otp){
-        console.log(phone);
         let verifiedCredential = await VerifiedCredential.findOne({phone});
 
         if(!verifiedCredential)
@@ -94,7 +93,7 @@ const verifiedCredentialsServices = {
         let verifiedCredential = await VerifiedCredential.findOne({phone, verified: true});
 
         if(!verifiedCredential)
-            throw new createHttpError.BadRequest("Email is not verified");
+            throw new createHttpError.BadRequest("Phone is not verified");
     },
 
     async verifyForgotPassword(email, otp){

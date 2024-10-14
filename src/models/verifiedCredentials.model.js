@@ -6,6 +6,7 @@ const VerifiedCredentialSchema = new Schema({
     email: {
         type: String,
         unique: true,
+        sparse: true,
         match: [/.+@.+\..+/, 'Please enter a valid email address']
     },
     phone: {

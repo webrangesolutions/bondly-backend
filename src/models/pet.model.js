@@ -3,12 +3,18 @@ import mongoose from "mongoose"
 const Schema = mongoose.Schema;
 
 const PetSchema = new Schema({
-  petOwner:{ //If We need to show that Pet Carer also owns pets, then refer User Id here instead.
+  user: {
+    type: Schema.ObjectId,
+    ref: "User",
+    // unique: true,
+    // required: true
+  },
+  petOwner: { //If We need to show that Pet Carer also owns pets, then refer User Id here instead.
     type: Schema.ObjectId,
     ref: "PetOwner",
-    required: true
+    // required: true
   },
-  type:{
+  type: {
     type: String,
     required: true
   },
@@ -22,35 +28,41 @@ const PetSchema = new Schema({
   },
   breed: {
     type: String,
-    required: true
+
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female'],
+
   },
   physicalAttributes: {
     type: String,
-    required: true
+    // required: true
   },
   dob: {
     type: Date,
     required: true
   },
-  homeAddress:{
+  homeAddress: {
     type: String,
-    required: true
+    // required: true
   },
-  spayedOrCastrated:{
+  spayedOrCastrated: {
     type: Boolean,
     required: true,
     default: false
   },
   microchipNumber: {
     type: String,
-    required: true,
-    unique: true
+    // required: true,
+    // unique: true
+    //it is not in the petCarer pets detail...
   },
   hobbies: {
     type: String,
     default: ""
   },
-  favouriteActivities:{
+  favouriteActivities: {
     type: String,
     default: ""
   },
@@ -58,27 +70,27 @@ const PetSchema = new Schema({
     type: String,
     default: ""
   },
-  clinicName:{
+  clinicName: {
     type: String,
-    required: true
+    // required: true
   },
   veterainDoctorName: {
     type: String,
-    required: true
+    // required: true
   },
-  clinicAddress:{
+  clinicAddress: {
     type: String,
-    required: true
+    // required: true
   },
-  clinicPhoneNumber:{
+  clinicPhoneNumber: {
     countryCode: {
-        type: String,
-        required: true
+      type: String,
+      // required: true
     },
-        number: {
-        type: String,
-        required: true,
-        match: [/^\d+$/, 'Please enter a valid phone number']
+    number: {
+      type: String,
+      // required: true,
+      match: [/^\d+$/, 'Please enter a valid phone number']
     }
   },
   medicalHistory: {
@@ -89,11 +101,52 @@ const PetSchema = new Schema({
     type: String,
     default: ""
   },
-  size: {
+  petSize: {
+    size: {
+      type: String,
+      // enum: ['Small', 'Medium', 'Large'], 
+      required: false
+    },
+    weight: {
+      type: String,
+      required: false
+    }
+  },
+  animalClass: {
     type: String,
-    required: true
+    default: ""
+  },
+  aboutYourPet: {
+    type: String,
+    default: ""
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  createdBy: {
+    type: Schema.ObjectId,
+    ref: "User",
+    default: null
+  },
+  updatedBy: {
+    type: Schema.ObjectId,
+    ref: "User",
+    default: null
   }
+}, {
+  timestamps: true // createdAt and updatedAt will be handled automatically by Mongoose
 });
+
+// Middleware to set updatedBy before updating
+PetSchema.pre('findOneAndUpdate', function (next) {
+  const userId = this.getOptions().context.userId; // Retrieve userId from context
+  if (userId) {
+    this.set({ updatedBy: userId }); // Set the updatedBy field
+  }
+  next();
+});
+
 
 let Pet = mongoose.model('Pet', PetSchema);
 

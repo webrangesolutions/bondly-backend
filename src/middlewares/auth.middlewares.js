@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 
 export function authGuard(role){
     return (req, res, next)=>{
-        try{
+        try {
             const token = req.header("Authorization");
             if(!token)
                 throw new Error("Authorization Token doesn't Exist")

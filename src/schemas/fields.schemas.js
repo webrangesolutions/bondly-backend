@@ -28,3 +28,8 @@ export const locationSchema = Joi.object({
     lat: Joi.number().greater(-90).less(90).required(),
     lng: Joi.number().greater(-180).less(180).required()
 })
+export const newLocationSchema = Joi.object({
+    lat: Joi.number().greater(-90).less(90).required(),
+    lng: Joi.number().greater(-180).less(180).required(),
+    name:Joi.string()
+})
