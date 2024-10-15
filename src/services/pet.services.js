@@ -8,7 +8,7 @@ import PetCarer from "../models/petCarer.model.js";
 const petServices = {
     async addPet(petOwnerId, image, type, name, breed, physicalAttributes, dob,
         homeAddress, spayedOrCastrated, microchipNumber, hobbies, favouriteActivities, fearsAndTriggers,
-        clinicName, veterainDoctorName, clinicAddress, clinicCountryCode, clinicPhoneNumber, medicalHistory, specialNotes, size) {
+        clinicName, veterainDoctorName, clinicAddress, clinicCountryCode, clinicPhoneNumber, medicalHistory, specialNotes, size, gender) {
 
         let petOwner = await PetOwner.findById(petOwnerId);
 
@@ -23,7 +23,7 @@ const petServices = {
             },
             type, name, breed, physicalAttributes, dob, homeAddress,
             spayedOrCastrated, microchipNumber, hobbies, favouriteActivities, fearsAndTriggers, clinicName,
-            veterainDoctorName, clinicAddress, medicalHistory, specialNotes, size
+            veterainDoctorName, clinicAddress, medicalHistory, specialNotes, size, gender
         })
 
         pet.imageUrl = await uploadFileToFirebase(`pets/${pet._id}`, "image", image);
@@ -112,8 +112,74 @@ const petServices = {
 
         return { petCarer, pets: petCarer.pets };
     }
+    ,
+    async getPetsByPetOwnerId(userId) {
+        let allPets = await Pet.find({ "petOwner": userId });
+        return { allPets };
+    },
+    async updatePetByPetOwner(
+        petOwnerId, petId, image, type, name, breed, physicalAttributes, dob,
+        homeAddress, spayedOrCastrated, microchipNumber, hobbies, favouriteActivities, fearsAndTriggers,
+        clinicName, veterainDoctorName, clinicAddress, clinicCountryCode, clinicPhoneNumber,
+        medicalHistory, specialNotes, size
+    ) {
+        // Find the Pet Owner
+        let petOwner = await PetOwner.findById(petOwnerId);
 
+        if (!petOwner) {
+            throw new createHttpError.NotFound("Pet Owner not found");
+        }
 
+        // Find the existing Pet
+        let pet = await Pet.findById(petId);
+
+        if (!pet) {
+            throw new createHttpError.NotFound("Pet not found");
+        }
+
+        // Update pet details
+        pet.type = type || pet.type;
+        pet.name = name || pet.name;
+        pet.breed = breed || pet.breed;
+        pet.physicalAttributes = physicalAttributes || pet.physicalAttributes;
+        pet.dob = dob || pet.dob;
+        pet.homeAddress = homeAddress || pet.homeAddress;
+        pet.spayedOrCastrated = spayedOrCastrated || pet.spayedOrCastrated;
+        pet.microchipNumber = microchipNumber || pet.microchipNumber;
+        pet.hobbies = hobbies || pet.hobbies;
+        pet.favouriteActivities = favouriteActivities || pet.favouriteActivities;
+        pet.fearsAndTriggers = fearsAndTriggers || pet.fearsAndTriggers;
+        pet.clinicName = clinicName || pet.clinicName;
+        pet.veterainDoctorName = veterainDoctorName || pet.veterainDoctorName;
+        pet.clinicAddress = clinicAddress || pet.clinicAddress;
+        pet.medicalHistory = medicalHistory || pet.medicalHistory;
+        pet.specialNotes = specialNotes || pet.specialNotes;
+        pet.size = size || pet.size;
+
+        // Update clinicPhoneNumber with countryCode and number
+        pet.clinicPhoneNumber = {
+            countryCode: clinicCountryCode || pet.clinicPhoneNumber?.countryCode,
+            number: clinicPhoneNumber || pet.clinicPhoneNumber?.number
+        };
+
+        // If an image is provided, upload the image and update the imageUrl
+        if (image) {
+            pet.imageUrl = await uploadFileToFirebase(`pets/${pet._id}`, "image", image);
+        }
+
+        // Save the updated pet details
+        await pet.save();
+
+        // Ensure the pet is in the petOwner's list of pets
+        if (!petOwner.pets.includes(pet._id)) {
+            petOwner.pets.push(pet._id);
+        }
+
+        // Save the pet owner
+        await petOwner.save();
+
+        return { pet };
+    }
 
 }
 

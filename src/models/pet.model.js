@@ -33,7 +33,6 @@ const PetSchema = new Schema({
   gender: {
     type: String,
     enum: ['Male', 'Female'],
-
   },
   physicalAttributes: {
     type: String,
@@ -135,14 +134,13 @@ const PetSchema = new Schema({
     default: null
   }
 }, {
-  timestamps: true // createdAt and updatedAt will be handled automatically by Mongoose
+  timestamps: true
 });
 
-// Middleware to set updatedBy before updating
 PetSchema.pre('findOneAndUpdate', function (next) {
-  const userId = this.getOptions().context.userId; // Retrieve userId from context
+  const userId = this.getOptions().context.userId;
   if (userId) {
-    this.set({ updatedBy: userId }); // Set the updatedBy field
+    this.set({ updatedBy: userId });
   }
   next();
 });

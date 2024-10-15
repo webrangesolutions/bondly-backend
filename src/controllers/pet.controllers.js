@@ -85,7 +85,37 @@ const petController = {
             locationLat, locationLng, emergencyNumber, profileImage);
 
         return res.status(200).send(dataResponse("Your Pet Owner Profile has been updated", resBody));
-    }
+    },
+
+    async getPetsByPetOwnerId(req, res, next) {
+        const userId = req.petOwner;  // Getting the ID from the URL
+        if (!userId) {
+            return res.status(404).json({ message: "No Pet found" });
+        }
+        let resBody = await petServices.getPetsByPetOwnerId(userId);
+
+        return res.status(200).send(dataResponse("All Pets under this user", resBody));
+    },
+    async addPetByOwner(req, res, next) {
+        let petOwnerId = req.petOwner;
+
+        let image = req.file;
+
+        let { type, name, breed, physicalAttributes, dob, homeAddress,
+            spayedOrCastrated, microchipNumber, hobbies, favouriteActivities,
+            fearsAndTriggers, clinicName, veterainDoctorName, clinicAddress, clinicCountryCode,
+            clinicPhoneNumber, medicalHistory, specialNotes, size, gender } = req.body;
+
+        if (!image)
+            throw new createHttpError.BadRequest("Image not found");
+
+        let resBody = await petServices.addPet(petOwnerId, image, type, name, breed, physicalAttributes, dob,
+            homeAddress, spayedOrCastrated, microchipNumber, hobbies, favouriteActivities, fearsAndTriggers,
+            clinicName, veterainDoctorName, clinicAddress, clinicCountryCode, clinicPhoneNumber, medicalHistory, specialNotes, size, gender);
+
+        return res.status(201).send(dataResponse("Pet has been added.", resBody));
+
+    },
 }
 
 export default petController;

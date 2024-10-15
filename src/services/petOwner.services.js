@@ -1,40 +1,43 @@
+import createHttpError from "http-errors";
+import Pet from "../models/pet.model.js";
+import DropIn from "../models/petDropIn.model.js";
 import PetOwner from "../models/petOwner.model.js";
+import PetWalk from "../models/petWalk.model.js";
 import User from "../models/user.model.js";
 import petOwnerRepository from "../repositories/petOwner.repositories.js";
 import { uploadFileToFirebase } from "./storage.services.js";
+import PetSitting from "../models/petSitting.model.js";
+import FavouritePetCarer from "../models/favouritePetCarer.model.js";
 
 const petOwnerServices = {
-    async getSpecificPetOwner(id){
+    async getSpecificPetOwner(id) {
         let petOwner = await petOwnerRepository.getSpecificPetOwner(id);
 
-        return {petOwner}
+        return { petOwner }
     },
 
     async updateSpecificPetOwner(petOwnerId, firstName, lastName, dob, address,
-        locationLat, locationLng, emergencyNumber, profileImage){
+        locationLat, locationLng, emergencyNumber, profileImage) {
 
-        //Getting Pet Owner and User
         let petOwner = await PetOwner.findById(petOwnerId);
 
         let user = await User.findById(petOwner.user);
 
-        // Updating User
         let profileImageUrl;
 
-        if(profileImage){
+        if (profileImage) {
             profileImageUrl = await uploadFileToFirebase(`/users/${user._id}/`, "profileImage", profileImage);
             user.profileImageUrl = profileImageUrl;
         }
 
-        if(firstName) user.firstName = firstName;
-        if(lastName) user.lastName = lastName;
-        if(dob) user.dob = dob;
-    
-        //Updating Pet Owner
-        if(address) petOwner.address = address;
-        if(locationLat) petOwner.location.lat = locationLat;
-        if(locationLng) petOwner.location.lng = locationLng;
-        if(emergencyNumber) petOwner.emergencyNumber = emergencyNumber;
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (dob) user.dob = dob;
+
+        if (address) petOwner.address = address;
+        if (locationLat) petOwner.location.lat = locationLat;
+        if (locationLng) petOwner.location.lng = locationLng;
+        if (emergencyNumber) petOwner.emergencyNumber = emergencyNumber;
 
         await petOwner.save();
         await user.save();
@@ -45,6 +48,168 @@ const petOwnerServices = {
                 ...petOwner.toObject()
             }
         }
+    }
+    , async addPetWalkRequest(
+        requestedBy,
+        pickUpLocation,
+        timeSlots,
+        confirmationDate,
+        genderPreference,
+        specialInstruction,
+        houseAccessInstructions,
+        preferedPetWalker,
+        orderPrice,
+        createdBy) {
+
+        const newPetWalk = new PetWalk({
+            requestedBy,
+            pickUpLocation,
+            timeSlots,
+            confirmationDate,
+            genderPreference,
+            specialInstruction,
+            houseAccessInstructions,
+            preferedPetWalker,
+            orderPrice,
+            createdBy,
+            isActive: true
+        });
+
+        const savedPetWalk = await newPetWalk.save();
+
+        return savedPetWalk;
+    }, async addPetSittingRequest(
+        requestedBy,
+        confirmationDate,
+        confirmationTime,
+        preferedSittingLocation,
+        walkPerDay,
+        mealsPerDay,
+        medicalInstructions,
+        timeSlots,
+        medicalInsRequired,
+        specialNotes,
+        preferedDogSitter,
+        orderPrice,
+        createdBy
+    ) {
+        const newPetSitting = new PetSitting({
+            requestedBy,
+            confirmationDate,
+            confirmationTime,
+            preferedSittingLocation,
+            walkPerDay,
+            mealsPerDay,
+            medicalInstructions,
+            timeSlots,
+            medicalInsRequired,
+            specialNotes,
+            preferedDogSitter,
+            orderPrice,
+            createdBy,
+            isActive: true
+        });
+
+        const savedPetSitting = await newPetSitting.save();
+
+        return savedPetSitting;
+    },
+    async addDropInRequest(
+        requestedBy,
+        pickUpLocation,
+        timeSlots,
+        confirmationDate,
+        genderPreference,
+        feedingInstruction,
+        medicalInstruction,
+        houseAccessInstructions,
+        preferedDogWalker,
+        orderPrice
+    ) {
+
+        const newDropIn = new DropIn({
+            requestedBy,
+            pickUpLocation,
+            timeSlots,
+            confirmationDate,
+            genderPreference,
+            feedingInstruction,
+            medicalInstruction,
+            houseAccessInstructions,
+            preferedDogWalker,
+            orderPrice,
+            createdBy: requestedBy,
+            isActive: true
+        });
+
+        const savedDropIn = await newDropIn.save();
+        return savedDropIn;
+    },
+    async getPetOwnerRequests(requestedBy) {
+        const petWalkRequests = await PetWalk.find({ requestedBy: requestedBy });
+        const petSittingRequests = await PetSitting.find({ requestedBy: requestedBy });
+        const dropInRequests = await DropIn.find({ requestedBy: requestedBy });
+        const allRequests = [
+            ...petWalkRequests,
+            ...petSittingRequests,
+            ...dropInRequests
+        ];
+
+        return {
+            allRequests
+        };
+    },
+    async addFavouritePetCarer(petOwnerId, favouritePetCarer) {
+        const newFavouritePetCarer = new FavouritePetCarer(
+            {
+                petOwner: petOwnerId,
+                favouritePetCarer,
+                createdBy: petOwnerId
+            }
+        )
+
+        let savedFavouritePetCarer = await newFavouritePetCarer.save();
+        return {
+            savedFavouritePetCarer
+        };
+    },
+    async getFavouritePetCarer(petOwnerId) {
+        let favouritePetCarer = await FavouritePetCarer.find({ petOwner: petOwnerId });
+        return {
+            favouritePetCarer
+        };
+    },
+    async updateFavouritePetCarer(petOwnerId, favouritePetCarerId) {
+        const updatedFavouritePetCarer = await FavouritePetCarer.findOneAndUpdate(
+            { petOwner: petOwnerId },
+            {
+                $set: {
+                    favouritePetCarer: [{ petCarer: favouritePetCarerId }],
+                    updatedBy: petOwnerId
+                }
+            },
+            { new: true }
+        );
+
+        return {
+            updatedFavouritePetCarer
+        };
+    },
+    async deleteFavouritePetCarer(petOwnerId, petCarerId) {
+        const updatedFavouritePetCarer = await FavouritePetCarer.findOneAndUpdate(
+            { petOwner: petOwnerId },
+            {
+                $pull: {
+                    favouritePetCarer: { petCarer: petCarerId }
+                },
+                updatedBy: petOwnerId
+            },
+            { new: true, runValidators: true }
+        );
+
+        return {
+            updatedFavouritePetCarer
+        };
     }
 }
 
