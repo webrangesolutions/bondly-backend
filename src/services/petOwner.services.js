@@ -51,6 +51,7 @@ const petOwnerServices = {
     }
     , async addPetWalkRequest(
         requestedBy,
+        requestType,
         pickUpLocation,
         timeSlots,
         confirmationDate,
@@ -59,10 +60,12 @@ const petOwnerServices = {
         houseAccessInstructions,
         preferedPetWalker,
         orderPrice,
-        createdBy) {
+        createdBy,
+        favouriteOnes) {
 
         const newPetWalk = new PetWalk({
             requestedBy,
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -72,7 +75,8 @@ const petOwnerServices = {
             preferedPetWalker,
             orderPrice,
             createdBy,
-            isActive: true
+            isActive: true,
+            favouriteOnes
         });
 
         const savedPetWalk = await newPetWalk.save();
@@ -80,6 +84,7 @@ const petOwnerServices = {
         return savedPetWalk;
     }, async addPetSittingRequest(
         requestedBy,
+        requestType,
         confirmationDate,
         confirmationTime,
         preferedSittingLocation,
@@ -91,10 +96,12 @@ const petOwnerServices = {
         specialNotes,
         preferedDogSitter,
         orderPrice,
-        createdBy
+        createdBy,
+        favouriteOnes
     ) {
         const newPetSitting = new PetSitting({
             requestedBy,
+            requestType,
             confirmationDate,
             confirmationTime,
             preferedSittingLocation,
@@ -107,7 +114,8 @@ const petOwnerServices = {
             preferedDogSitter,
             orderPrice,
             createdBy,
-            isActive: true
+            isActive: true,
+            favouriteOnes
         });
 
         const savedPetSitting = await newPetSitting.save();
@@ -116,6 +124,7 @@ const petOwnerServices = {
     },
     async addDropInRequest(
         requestedBy,
+        requestType,
         pickUpLocation,
         timeSlots,
         confirmationDate,
@@ -124,11 +133,13 @@ const petOwnerServices = {
         medicalInstruction,
         houseAccessInstructions,
         preferedDogWalker,
-        orderPrice
+        orderPrice,
+        favouriteOnes
     ) {
 
         const newDropIn = new DropIn({
             requestedBy,
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -139,7 +150,8 @@ const petOwnerServices = {
             preferedDogWalker,
             orderPrice,
             createdBy: requestedBy,
-            isActive: true
+            isActive: true,
+            favouriteOnes
         });
 
         const savedDropIn = await newDropIn.save();

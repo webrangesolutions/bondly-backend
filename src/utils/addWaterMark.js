@@ -6,8 +6,8 @@ const waterMark = await readFile(resolve("./public/images/logo.png"));
 
 export const addWaterMark = async (image) => {
   const mainImage = Sharp(image.buffer);
-
   const metadata = await mainImage.metadata();
+
   const { width, height } = metadata;
 
   const leftPercentage = 10;
@@ -31,7 +31,6 @@ export const addWaterMark = async (image) => {
     ])
     .png()
     .toBuffer();
-
   return {
     ...image,
     buffer: waterMarkedImage,

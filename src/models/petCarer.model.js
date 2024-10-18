@@ -66,6 +66,22 @@ const PetCarerSchema = new Schema({
         type: Boolean,
         default: false
     },
+    points: {
+        type: Number,
+        default: 0
+    },
+    rating: {
+        type: Number,
+        default: 0
+    },
+    averageResponseTime: {
+        type: Number,
+        default: 0
+    },
+    isVarified: {
+        type: Boolean,
+        default: false
+    },
     // pets: {
     //     type: [
     //         {
@@ -75,6 +91,7 @@ const PetCarerSchema = new Schema({
     //     ],
     //     default: []
     // },
+
     isActive: {
         type: Boolean,
         default: true

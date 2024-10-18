@@ -9,7 +9,7 @@ const adminRouter = express.Router();
 
 //-------------Profile--------------//
 
-adminRouter.post('/uploadSignupVideo',  upload.single("file"),
+adminRouter.post('/uploadSignupVideo', upload.single("file"),
     // authGuard('admin'),
     errorHandler(fileManagementController.uploadSignupVideo)
 )

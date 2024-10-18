@@ -3,6 +3,14 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const PetSittingSchema = new Schema({
+    requestName: {
+        type: String,
+        default: "Pet Sitting"
+    },
+    requestType: {
+        type: String,
+        enum: ['normal', 'medium', 'high']
+    },
     requestedBy: {
         type: Schema.ObjectId,
         ref: "User",
@@ -36,6 +44,9 @@ const PetSittingSchema = new Schema({
                 type: String,
                 enum: ['key Pickup', 'key exchange']
             },
+            overNight: {
+                type: Boolean
+            },
             timeArrival: Date,
             timeDeparture: Date
         },
@@ -61,6 +72,16 @@ const PetSittingSchema = new Schema({
         type: String,
         enum: ['confirm', 'pending'],
         default: 'pending'
+    },
+    favouriteOnes: {
+        type: [
+            {
+                petCarer: {
+                    type: Schema.ObjectId,
+                    ref: "PetCarer"
+                },
+            }
+        ]
     },
     isActive: {
         type: Boolean,

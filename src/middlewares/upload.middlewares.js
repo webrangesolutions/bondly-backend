@@ -10,4 +10,5 @@ const multipleUploads = upload.fields([
     { name: "images", maxCount: 999 },
     { name: "homePictures", maxCount: 999 },
 ]);
+
 export { upload, multipleUploads }

@@ -116,6 +116,7 @@ const petController = {
         return res.status(201).send(dataResponse("Pet has been added.", resBody));
 
     },
+
 }
 
 export default petController;

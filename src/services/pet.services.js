@@ -46,21 +46,16 @@ const petServices = {
         if (!petCarer) {
             throw new createHttpError.NotFound("Pet Carer not found");
         }
-
-        // Ensure at least two home pictures
         if (homePictures.length < 2) {
             throw new createHttpError.BadRequest("At least two home pictures are required");
         }
 
-        // Prepare file upload promises for home pictures
+
         const homePictureUploadPromises = homePictures.map((picture, index) => {
             return uploadFileToFirebase(`homePictures/${petCarerId}`, `homePic_${index}`, picture);
         });
-
-        // Upload all home pictures concurrently using Promise.all()
         const homePictureUrls = await Promise.all(homePictureUploadPromises);
 
-        // Update Pet Carer details
         petCarer.homeType = homeType || petCarer.homeType;
         petCarer.floor = floor || petCarer.floor;
         petCarer.elevatorAvailable = elevatorAvailable || petCarer.elevatorAvailable;

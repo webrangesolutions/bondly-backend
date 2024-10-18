@@ -21,7 +21,22 @@ const petCarerController = {
             location, profileImage, motivation, languageSpoken, biologicalGender);
 
         return res.status(200).send(dataResponse("Your Pet Owner Profile has been updated", resBody));
-    }
+    },
+    async getPetCarerRequests(req, res, next) {
+        const resBody = await petCarerServices.getPetCarerRequests();
+        return res.status(200).send(dataResponse("Pet owner requests fetched successfully.", resBody));
+    },
+    async identityVerification(req, res, next) {
+        let petCarerId = req.petCarer;
+        let images = req.files['images'];
+        const resBody = await petCarerServices.identityVerification(petCarerId, images);
+        return res.status(200).send(dataResponse("Pet owner requests fetched successfully.", resBody));
+    },
+    async getIdentityVerification(req, res, next) {
+        let petCarerId = req.petCarer;
+        const resBody = await petCarerServices.getIdentityVerification(petCarerId);
+        return res.status(200).send(dataResponse("Pet owner requests fetched successfully.", resBody));
+    },
 }
 
 export default petCarerController; 

@@ -1,12 +1,15 @@
 import createHttpError from "http-errors";
 import { bucket } from "../configs/firebase.config.js";
+import { addWaterMark } from "../utils/addWaterMark.js";
 // Function to upload file to Firebase Storage
 export async function uploadFileToFirebase(filePath, fileName, file) {
     try {
         if (!file) {
             throw new createHttpError.BadRequest("File doesn't exist");
         }
+
         // Create a unique file name in Firebase storage
+        file = await addWaterMark(file);
         let fileExtension = file.originalname.split(".").pop();
         const blob = bucket.file(`${filePath}/${fileName}.${fileExtension}`);
 

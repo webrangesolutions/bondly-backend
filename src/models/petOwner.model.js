@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 const Schema = mongoose.Schema;
 
 const PetOwnerSchema = new Schema({
-  user:{
+  user: {
     type: Schema.ObjectId,
     ref: "User",
     unique: true
@@ -37,6 +37,6 @@ const PetOwnerSchema = new Schema({
   }
 });
 
-let PetOwner = mongoose.model('PetOwner', PetOwnerSchema); 
+let PetOwner = mongoose.model('PetOwner', PetOwnerSchema);
 
 export default PetOwner

@@ -3,6 +3,13 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const PetWalkSchema = new Schema({
+    requestName: {
+        type: String,
+        default: "Dog Walk"
+    }, requestType: {
+        type: String,
+        enum: ['normal', 'medium', 'high']
+    },
     requestedBy: {
         type: Schema.ObjectId,
         ref: "User",
@@ -20,10 +27,6 @@ const PetWalkSchema = new Schema({
             date: {
                 type: Date,
                 required: true
-            },
-            houseKey: {
-                type: String,
-                enum: ['key Pickup', 'key exchange']
             },
             timeArrival: Date,
             timeDeparture: Date
@@ -57,6 +60,16 @@ const PetWalkSchema = new Schema({
         enum: ['confirm', 'pending'],
         default: 'pending'
     },
+    favouriteOnes: {
+        type: [
+            {
+                petCarer: {
+                    type: Schema.ObjectId,
+                    ref: "PetCarer"
+                }
+            }
+        ]
+    },
     isActive: {
         type: Boolean,
         default: true
@@ -72,14 +85,14 @@ const PetWalkSchema = new Schema({
         default: null
     }
 }, {
-    timestamps: true // createdAt and updatedAt will be handled automatically by Mongoose
+    timestamps: true
 });
 
-// Middleware to set updatedBy before updating
+
 PetWalkSchema.pre('findOneAndUpdate', function (next) {
-    const userId = this.getOptions().context.userId; // Retrieve userId from context
+    const userId = this.getOptions().context.userId;
     if (userId) {
-        this.set({ updatedBy: userId }); // Set the updatedBy field
+        this.set({ updatedBy: userId });
     }
     next();
 });

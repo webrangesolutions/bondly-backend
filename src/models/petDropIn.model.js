@@ -3,9 +3,16 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const PetDropIn = new Schema({
+    requestName: {
+        type: String,
+        default: "Drop Ins"
+    }, requestType: {
+        type: String,
+        enum: ['normal', 'medium', 'high']
+    },
     requestedBy: {
         type: Schema.ObjectId,
-        ref: "User",
+        ref: "PetOwner",
     },
     pickUpLocation: {
         type: {
@@ -20,10 +27,6 @@ const PetDropIn = new Schema({
             date: {
                 type: Date,
                 required: true
-            },
-            houseKey: {
-                type: String,
-                enum: ['key Pickup', 'key exchange']
             },
             timeArrival: Date,
             timeDeparture: Date
@@ -60,6 +63,16 @@ const PetDropIn = new Schema({
         type: String,
         enum: ['confirm', 'pending'],
         default: 'pending'
+    },
+    favouriteOnes: {
+        type: [
+            {
+                petCarer: {
+                    type: Schema.ObjectId,
+                    ref: "PetCarer"
+                }
+            }
+        ]
     },
     isActive: {
         type: Boolean,

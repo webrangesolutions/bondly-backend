@@ -25,9 +25,27 @@ petCarerRouter.patch('/me',
 //-------------Pets---------------//
 petCarerRouter.post(
     '/pets',
-    multipleUploads, // This handles both single image and home pictures array
+    multipleUploads,
     authGuard("petCarer"),
     errorHandler(petController.addPetByPetCarer)
+);
+
+
+petCarerRouter.get('/me/getPetCarerRequests',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.getPetCarerRequests)
+)
+
+petCarerRouter.post(
+    '/me/identityVerification',
+    multipleUploads,
+    authGuard("petCarer"),
+    errorHandler(petCarerController.identityVerification)
+);
+petCarerRouter.get(
+    '/me/identityVerification',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.getIdentityVerification)
 );
 
 export default petCarerRouter;

@@ -27,6 +27,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -34,7 +35,8 @@ const petOwnerController = {
             specialInstruction,
             houseAccessInstructions,
             preferedPetWalker,
-            orderPrice
+            orderPrice,
+            favouriteOnes
         } = req.body;
 
         const createdBy = requestedBy;
@@ -44,6 +46,7 @@ const petOwnerController = {
         }
         let resBody = await petOwnerServices.addPetWalkRequest(
             requestedBy,
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -52,7 +55,8 @@ const petOwnerController = {
             houseAccessInstructions,
             preferedPetWalker,
             orderPrice,
-            createdBy
+            createdBy,
+            favouriteOnes
         );
 
         return res.status(201).send(dataResponse("Dog walk request has been created.", resBody));
@@ -62,24 +66,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
-            confirmationDate,
-            confirmationTime,
-            preferedSittingLocation,
-            walkPerDay,
-            mealsPerDay,
-            medicalInstructions,
-            timeSlots,
-            medicalInsRequired,
-            specialNotes,
-            preferedDogSitter,
-            orderPrice
-        } = req.body;
-        const createdBy = requestedBy;
-        if (!preferedSittingLocation || !timeSlots || timeSlots.length === 0) {
-            throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
-        }
-        let resBody = await petOwnerServices.addPetSittingRequest(
-            requestedBy,
+            requestType,
             confirmationDate,
             confirmationTime,
             preferedSittingLocation,
@@ -91,7 +78,28 @@ const petOwnerController = {
             specialNotes,
             preferedDogSitter,
             orderPrice,
-            createdBy
+            favouriteOnes
+        } = req.body;
+        const createdBy = requestedBy;
+        if (!preferedSittingLocation || !timeSlots || timeSlots.length === 0) {
+            throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
+        }
+        let resBody = await petOwnerServices.addPetSittingRequest(
+            requestedBy,
+            requestType,
+            confirmationDate,
+            confirmationTime,
+            preferedSittingLocation,
+            walkPerDay,
+            mealsPerDay,
+            medicalInstructions,
+            timeSlots,
+            medicalInsRequired,
+            specialNotes,
+            preferedDogSitter,
+            orderPrice,
+            createdBy,
+            favouriteOnes
         );
 
         return res.status(201).send(dataResponse("Pet sitting request has been created.", resBody));
@@ -101,6 +109,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -109,13 +118,15 @@ const petOwnerController = {
             medicalInstruction,
             houseAccessInstructions,
             preferedDogWalker,
-            orderPrice
+            orderPrice,
+            favouriteOnes
         } = req.body;
         if (!genderPreference || !timeSlots || timeSlots.length === 0) {
             throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
         }
         let resBody = await petOwnerServices.addDropInRequest(
             requestedBy,
+            requestType,
             pickUpLocation,
             timeSlots,
             confirmationDate,
@@ -124,7 +135,8 @@ const petOwnerController = {
             medicalInstruction,
             houseAccessInstructions,
             preferedDogWalker,
-            orderPrice
+            orderPrice,
+            favouriteOnes
         );
 
         return res.status(201).send(dataResponse("Pet drop-in request has been created.", resBody));

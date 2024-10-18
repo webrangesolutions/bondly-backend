@@ -5,6 +5,11 @@ import petCarerRepository from "../repositories/petCarer.repositories.js";
 import { uploadFileToFirebase } from "./storage.services.js";
 import validateRequiredFields from "../utils/validationUtils.js";
 import createHttpError from "http-errors";
+import PetWalk from "../models/petWalk.model.js";
+import PetSitting from "../models/petSitting.model.js";
+import DropIn from "../models/petDropIn.model.js";
+import VerifiedPetCarer from '../models/verifiedPetCarer.model.js'
+import { addWaterMark } from "../utils/addWaterMark.js";
 const petCarerServices = {
     async getSpecificPetCarer(id) {
         let petCarer = await petCarerRepository.getSpecificPetCarer(id);
@@ -59,8 +64,51 @@ const petCarerServices = {
                 ...petCarer.toObject()
             }
         };
-    }
+    },
+    async getPetCarerRequests() {
+        const petWalkRequests = await PetWalk.find();
 
+        const petSittingRequests = await PetSitting.find();
+
+        const dropInRequests = await DropIn.find();
+
+        const allRequests = [
+            ...petWalkRequests,
+            ...petSittingRequests,
+            ...dropInRequests
+        ];
+
+        return {
+            allRequests
+        };
+    },
+    async identityVerification(petCarerId, images) {
+
+        const imageUploadPromises = images.map(async (picture, index) => {
+            return uploadFileToFirebase(`verificationImages/${petCarerId}`, `IdCard_${index}`, picture);
+        });
+
+
+        const imagesPictureUrls = await Promise.all(imageUploadPromises);
+
+        let verificationDetail = new VerifiedPetCarer({
+            petCarer: petCarerId,
+            images: imagesPictureUrls,
+            createdBy: petCarerId
+        })
+        let verify = await verificationDetail.save();
+        return {
+            verify
+        }
+    },
+    async getIdentityVerification(petCarerId) {
+
+
+        let verifiedDetails = await VerifiedPetCarer.find({ petCarer: petCarerId })
+        return {
+            verifiedDetails
+        }
+    },
 }
 
 export default petCarerServices;
