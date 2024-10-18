@@ -8,6 +8,7 @@ import petOwnerRepository from "../repositories/petOwner.repositories.js";
 import { uploadFileToFirebase } from "./storage.services.js";
 import PetSitting from "../models/petSitting.model.js";
 import FavouritePetCarer from "../models/favouritePetCarer.model.js";
+import Order from "../models/order.model.js";
 
 const petOwnerServices = {
     async getSpecificPetOwner(id) {
@@ -221,6 +222,48 @@ const petOwnerServices = {
 
         return {
             updatedFavouritePetCarer
+        };
+    },
+    async acceptOrderByPetOwner(orderId, status, petOwnerId) {
+        let order = await Order.findById(orderId)
+        let request;
+        if (order.orderRequest.petWalk) {
+            request = await PetWalk.findByIdAndUpdate(order.orderRequest.petWalk, {
+                $set: {
+                    status: 'confirm',
+                    updatedBy: petOwnerId
+                }
+            }, { new: true })
+        }
+        if (order.orderRequest.petSitting) {
+            request = await PetSitting.findByIdAndUpdate(order.orderRequest.petSitting, {
+                $set: {
+                    status: 'confirm',
+                    updatedBy: petOwnerId
+                }
+            }, { new: true })
+        }
+        if (order.orderRequest.dropIn) {
+            request = await DropIn.findByIdAndUpdate(order.orderRequest.dropIn, {
+                $set: {
+                    status: 'confirm',
+                    updatedBy: petOwnerId
+                }
+            }, { new: true })
+        }
+        const acceptOrder = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                $set: {
+                    status: status,
+                    'updatedBy.petOwner': petOwnerId
+                }
+            },
+            { new: true }
+        );
+        return {
+            acceptOrder,
+            request
         };
     }
 }

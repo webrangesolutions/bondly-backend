@@ -10,6 +10,7 @@ import PetSitting from "../models/petSitting.model.js";
 import DropIn from "../models/petDropIn.model.js";
 import VerifiedPetCarer from '../models/verifiedPetCarer.model.js'
 import { addWaterMark } from "../utils/addWaterMark.js";
+import Order from "../models/order.model.js";
 const petCarerServices = {
     async getSpecificPetCarer(id) {
         let petCarer = await petCarerRepository.getSpecificPetCarer(id);
@@ -109,6 +110,64 @@ const petCarerServices = {
             verifiedDetails
         }
     },
+    async applyToOrder(petCarerId, orderRequest, orderTo) {
+        let order = new Order({
+            orderTo: orderTo,
+            orderRequest,
+            orderBy: petCarerId,
+            createdBy: petCarerId
+        })
+        let orderSave = await order.save();
+        return {
+            orderSave
+        }
+    },
+    async cancelOrderByPetCarer(orderId, status, petCarerId) {
+        const orderCancel = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                $set: {
+                    status: status,
+                    'updatedBy.petCarer': petCarerId
+                }
+            },
+            { new: true }
+        );
+        return {
+            orderCancel
+        };
+    },
+    async startOrderByPetCarer(orderId, status, petCarerId) {
+        const orderStart = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                $set: {
+                    status: status,
+                    'updatedBy.petCarer': petCarerId
+                }
+            },
+            { new: true }
+        );
+        return {
+            orderStart
+        };
+    },
+    async completeOrderByPetCarer(orderId, status, petCarerId) {
+        const orderStart = await Order.findByIdAndUpdate(
+            orderId,
+            {
+                $set: {
+                    status: status,
+                    'updatedBy.petCarer': petCarerId
+                }
+            },
+            { new: true }
+        );
+        return {
+            orderStart
+        };
+    }
+
 }
 
 export default petCarerServices;

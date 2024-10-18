@@ -76,4 +76,9 @@ petOwnerRouter.delete('/me/deleteFavouritePetCarer',
     authGuard("petOwner"),
     errorHandler(petOwnerController.deleteFavouritePetCarer)
 )
+petOwnerRouter.patch(
+    '/me/acceptOrderRequest',
+    authGuard("petOwner"),
+    errorHandler(petOwnerController.acceptOrderByPetOwner)
+);
 export default petOwnerRouter;

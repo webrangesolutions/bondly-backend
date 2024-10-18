@@ -47,5 +47,25 @@ petCarerRouter.get(
     authGuard("petCarer"),
     errorHandler(petCarerController.getIdentityVerification)
 );
+petCarerRouter.post(
+    '/me/applyToOrder',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.applyToOrder)
+);
+petCarerRouter.delete(
+    '/me/cancelOrderByPetCarer',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.cancelOrderByPetCarer)
+);
+petCarerRouter.patch(
+    '/me/startOrderByPetCarer',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.startOrderByPetCarer)
+);
+petCarerRouter.patch(
+    '/me/completeOrderByPetCarer',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.completeOrderByPetCarer)
+);
 
 export default petCarerRouter;

@@ -202,7 +202,12 @@ const petOwnerController = {
 
         return res.status(201).send(dataResponse("Pet drop-in request has been created.", resBody));
     },
-
+    async acceptOrderByPetOwner(req, res, next) {
+        let petOwnerId = req.petOwner;
+        let { orderId, status } = req.body;
+        const resBody = await petOwnerServices.acceptOrderByPetOwner(orderId, status, petOwnerId);
+        return res.status(200).send(dataResponse("Pet owner accepted request successfully.", resBody));
+    },
 }
 
 export default petOwnerController;

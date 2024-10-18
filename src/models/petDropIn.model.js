@@ -94,7 +94,7 @@ const PetDropIn = new Schema({
 
 // Middleware to set updatedBy before updating
 PetDropIn.pre('findOneAndUpdate', function (next) {
-    const userId = this.getOptions().context.userId; // Retrieve userId from context
+    const userId = this.getUpdate().updatedBy; // Retrieve userId from context
     if (userId) {
         this.set({ updatedBy: userId }); // Set the updatedBy field
     }

@@ -81,7 +81,7 @@ const PetWalkSchema = new Schema({
     },
     updatedBy: {
         type: Schema.ObjectId,
-        ref: "User",
+        ref: "PetOwner",
         default: null
     }
 }, {
@@ -90,7 +90,7 @@ const PetWalkSchema = new Schema({
 
 
 PetWalkSchema.pre('findOneAndUpdate', function (next) {
-    const userId = this.getOptions().context.userId;
+    const userId = this.getUpdate().updatedBy;
     if (userId) {
         this.set({ updatedBy: userId });
     }
