@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Image Upload Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      input[type="file"] {
+        margin: 10px 0;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #preview {
+        margin-top: 20px;
+        max-width: 300px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Upload an Image</h1>
+      <input type="file" id="imageInput" accept="image/*" />
+      <button onclick="sendImage()">Send Image</button>
+      <img id="preview" alt="Image Preview" />
+    </div>
+
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <!-- Include Socket.IO client library -->
+    <script>
+      const socket = io("http://localhost:8000"); // Replace with your server URL
+
+      function sendImage() {
+        const fileInput = document.getElementById("imageInput");
+        const file = fileInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function (event) {
+            const imageData = event.target.result;
+            socket.emit(
+              "sendChat",
+              "id_1",
+              "id_2",
+              "hello world message",
+              imageData
+            );
+            console.log("Image sent!");
+
+            // Show preview of the uploaded image
+            const imgPreview = document.getElementById("preview");
+            imgPreview.src = imageData;
+            imgPreview.style.display = "block";
+          };
+
+          // Read the file as a Data URL (for preview) and ArrayBuffer (for sending)
+          reader.readAsDataURL(file);
+        } else {
+          console.log("No file selected!");
+        }
+      }
+    </script>
+  </body>
+</html>
