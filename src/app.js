@@ -11,6 +11,8 @@ import { dirname } from "path";
 import { createTransporter } from "./utils/mailer.js";
 import GoogleStrategy from "passport-google-oauth2";
 import passport from "passport";
+import { Server } from "socket.io";
+import initSocket from "./sockets/index.socket.js";
 
 // Required for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -21,8 +23,18 @@ export class App {
     dotenv.config();
     this.app = express();
     this.http = new http.Server(this.app);
+
+    this.io = new Server(this.http, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      cors: {
+        origin: ["http://127.0.0.1:5500", "*"],
+      },
+    });
+
     this.PORT = process.env.PORT || 8000;
     this.initMiddleware();
+    this.initSocketIO();
     this.connectToMongoDB();
     this.initRoutes();
     this.initPassport();
@@ -107,6 +119,10 @@ export class App {
     const publicPath = path.join(__dirname, "..", "public");
     this.app.use(express.static(publicPath));
     this.app.use("/", router);
+  }
+
+  initSocketIO() {
+    initSocket(this.io);
   }
 
   createServer() {
