@@ -7,6 +7,7 @@ const upload = multer({ storage });
 
 // For multiple files: array and single combined
 const multipleUploads = upload.fields([
+    { name: "image", maxCount: 1 },
     { name: "images", maxCount: 999 },
     { name: "homePictures", maxCount: 999 },
 ]);

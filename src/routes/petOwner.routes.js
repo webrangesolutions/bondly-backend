@@ -2,7 +2,7 @@ import express from "express";
 import { errorHandler } from "../handlers/error.handlers.js";
 import { authGuard } from "../middlewares/auth.middlewares.js";
 import petOwnerController from "../controllers/petOwner.controllers.js";
-import { upload } from "../middlewares/upload.middlewares.js";
+import { multipleUploads, upload } from "../middlewares/upload.middlewares.js";
 import { bodyValidator } from "../middlewares/bodySchema.middlewares.js";
 import { addPetSchema } from "../schemas/pet.schemas.js";
 import petController from "../controllers/pet.controllers.js";
@@ -94,5 +94,49 @@ petOwnerRouter.patch(
   '/me/acceptOrderRequest',
   authGuard("petOwner"),
   errorHandler(petOwnerController.acceptOrderByPetOwner)
+);
+
+petOwnerRouter.post(
+  "/me/meetAndGreet/:id",
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.meetAndGreet)
+);
+
+petOwnerRouter.post(
+  "/me/goodFeedbackAndRating",
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.goodFeedbackAndRating)
+);
+
+petOwnerRouter.post(
+  "/me/badFeedbackAndRating",
+  multipleUploads,
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.badFeedbackAndRating)
+);
+
+
+petOwnerRouter.post(
+  "/me/removeAsFavourite",
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.removeAsFavourite)
+);
+
+petOwnerRouter.post(
+  "/me/badMeetAndGreetFeedback",
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.badMeetAndGreetFeedback)
+);
+
+petOwnerRouter.post(
+  "/me/goodMeetAndGreetFeedback",
+  authGuard("petOwner"),
+  // bodyValidator(),
+  errorHandler(petOwnerController.goodMeetAndGreetFeedback)
 );
 export default petOwnerRouter;

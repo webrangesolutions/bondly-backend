@@ -61,6 +61,66 @@ const petCarerController = {
         const resBody = await petCarerServices.completeOrderByPetCarer(orderId, status, petCarerId);
         return res.status(200).send(dataResponse("Pet owner completed order successfully.", resBody));
     },
+    // async updateRating(req, res, next) {
+    //     let petCarerId = req.petCarer;
+    //     let { orderId, status } = req.body;
+    //     const resBody = await petCarerServices.completeOrderByPetCarer(orderId, status, petCarerId);
+    //     return res.status(200).send(dataResponse("Pet owner completed order successfully.", resBody));
+    // },
+    // async updatePoints(req, res, next) {
+    //     let petCarerId = req.petCarer;
+    //     let { orderId, status } = req.body;
+    //     const resBody = await petCarerServices.completeOrderByPetCarer(orderId, status, petCarerId);
+    //     return res.status(200).send(dataResponse("Pet owner completed order successfully.", resBody));
+    // },
+    async contactus(req, res, next) {
+        let petCarerId = req.petCarer;
+        let { message } = req.body;
+        const resBody = await petCarerServices.contactus(petCarerId, message);
+        return res.status(200).send(dataResponse("Pet owner completed order successfully.", resBody));
+    },
+    async petCarerFeedback(req, res, next) {
+
+        let petCarerId = req.petCarer;
+        let images = req.files['images'] || [];
+        let {
+            petId,
+            orderId,
+            petOwnerId,
+            message
+        } = req.body;
+        if (!petCarerId)
+            throw new createHttpError.BadRequest("No petCarer found.");
+        let resBody = await petCarerServices.petCarerFeedback(
+            petId,
+            orderId,
+            petCarerId,
+            petOwnerId,
+            message,
+            images
+        );
+
+        return res.status(201).send(dataResponse("Pet Carer Feedback Send Succesfully.", resBody));
+    },
+    async meetAndGreetFeedback(req, res, next) {
+
+        let petCarerId = req.petCarer;
+        let {
+            meetAndGreetId,
+            petOwnerId,
+            petCarerFeedback
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petCarerServices.meetAndGreetFeedback(
+            meetAndGreetId,
+            petOwnerId,
+            petCarerId,
+            petCarerFeedback
+        );
+
+        return res.status(201).send(dataResponse("Bad Meet And Greet FeedBack Send Succesfully.", resBody));
+    },
 }
 
 export default petCarerController; 

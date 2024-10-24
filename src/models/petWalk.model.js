@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const PetWalkSchema = new Schema({
+    petId: {
+        type: Schema.ObjectId,
+        ref: "Pet"
+    },
     requestName: {
         type: String,
         default: "Dog Walk"

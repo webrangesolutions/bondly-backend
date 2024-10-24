@@ -9,6 +9,10 @@ import { uploadFileToFirebase } from "./storage.services.js";
 import PetSitting from "../models/petSitting.model.js";
 import FavouritePetCarer from "../models/favouritePetCarer.model.js";
 import Order from "../models/order.model.js";
+import meetAndGreet from "../models/meetAndGreets.model.js";
+import RatingFeedback from "../models/ratingFeeback.model.js";
+import RemoveFavourite from "../models/removeFavourite.model.js";
+import MeetAndGreet from "../models/meetAndGreetFeedback.model.js";
 
 const petOwnerServices = {
     async getSpecificPetOwner(id) {
@@ -51,6 +55,7 @@ const petOwnerServices = {
         }
     }
     , async addPetWalkRequest(
+        petId,
         requestedBy,
         requestType,
         pickUpLocation,
@@ -65,6 +70,7 @@ const petOwnerServices = {
         favouriteOnes) {
 
         const newPetWalk = new PetWalk({
+            petId,
             requestedBy,
             requestType,
             pickUpLocation,
@@ -84,6 +90,7 @@ const petOwnerServices = {
 
         return savedPetWalk;
     }, async addPetSittingRequest(
+        petId,
         requestedBy,
         requestType,
         confirmationDate,
@@ -101,6 +108,7 @@ const petOwnerServices = {
         favouriteOnes
     ) {
         const newPetSitting = new PetSitting({
+            petId,
             requestedBy,
             requestType,
             confirmationDate,
@@ -124,6 +132,7 @@ const petOwnerServices = {
         return savedPetSitting;
     },
     async addDropInRequest(
+        petId,
         requestedBy,
         requestType,
         pickUpLocation,
@@ -139,6 +148,7 @@ const petOwnerServices = {
     ) {
 
         const newDropIn = new DropIn({
+            petId,
             requestedBy,
             requestType,
             pickUpLocation,
@@ -265,7 +275,138 @@ const petOwnerServices = {
             acceptOrder,
             request
         };
-    }
+    },
+    async meetAndGreet(petOwnerId,
+        petCarerId,
+        date,
+        time,
+        confirmationDate,
+        preferedSittingLocation,
+        orderPrice) {
+        console.log(petCarerId)
+        let newMeetAndGreet = new meetAndGreet({
+            petCarerId: petCarerId,
+            petOwnerId: petOwnerId,
+            date: date,
+            time: time,
+            confirmationDate: confirmationDate,
+            preferedSittingLocation: preferedSittingLocation,
+            orderPrice: orderPrice
+            , createdBy: petOwnerId
+        });
+        let meetAndGreetSave = await newMeetAndGreet.save();
+        return {
+            meetAndGreetSave
+        };
+    },
+    async goodFeedbackAndRating(
+        orderId,
+        petOwnerId,
+        petCarerId,
+        rating,
+        message) {
+
+        let newFeedback = new RatingFeedback({
+            orderId: orderId,
+            petOwner: petOwnerId,
+            petCarer: petCarerId,
+            message: message,
+            rating: rating,
+            createdBy: petOwnerId
+        });
+        let feedbackSave = await newFeedback.save();
+        return {
+            feedbackSave
+        };
+    },
+    async badFeedbackAndRating(
+        orderId,
+        petOwnerId,
+        petCarerId,
+        rating,
+        specialIssues,
+        detailedFeedback,
+        images
+    ) {
+        const imageUploadPromises = images.map(async (picture, index) => {
+            return uploadFileToFirebase(`badFeedback/${orderId}`, `badFeedback_${index}`, picture);
+        });
+        const imagesPictureUrls = await Promise.all(imageUploadPromises);
+        let newFeedback = new RatingFeedback({
+            orderId: orderId,
+            petOwner: petOwnerId,
+            petCarer: petCarerId,
+            rating: rating,
+            specialIssues: specialIssues,
+            detailedFeedback: detailedFeedback,
+            images: imagesPictureUrls,
+            createdBy: petOwnerId
+        });
+        let feedbackSave = await newFeedback.save();
+        return {
+            feedbackSave
+        };
+    },
+    async removeAsFavourite(
+        petOwnerId,
+        petCarerId,
+        specialReasons,
+        message
+    ) {
+        let removeFeedback = new RemoveFavourite({
+            petOwner: petOwnerId,
+            petCarer: petCarerId,
+            specialReasons: specialReasons,
+            message: message,
+            createdBy: petOwnerId
+        });
+        let removeFeedbackSave = await removeFeedback.save();
+        return {
+            removeFeedbackSave
+        };
+    },
+    async badMeetAndGreetFeedback(
+        meetAndGreetId,
+        petOwnerId,
+        petCarerId,
+        negativeFeedback,
+        detailedNegativeFeedback
+    ) {
+
+        let newFeedback = new MeetAndGreet({
+            meetAndGreet: meetAndGreetId,
+            petOwner: petOwnerId,
+            petCarer: petCarerId,
+            negativeFeedback: negativeFeedback,
+            detailedNegativeFeedback: detailedNegativeFeedback,
+            createdBy: petOwnerId
+        });
+        let feedbackSave = await newFeedback.save();
+        return {
+            feedbackSave
+        };
+    },
+    async goodMeetAndGreetFeedback(
+        meetAndGreetId,
+        petOwnerId,
+        petCarerId,
+        positiveFeedback,
+        detailedPositiveFeedback
+    ) {
+
+        let newFeedback = new MeetAndGreet({
+            meetAndGreet: meetAndGreetId,
+            petOwner: petOwnerId,
+            petCarer: petCarerId,
+            positiveFeedback: positiveFeedback,
+            detailedPositiveFeedback: detailedPositiveFeedback,
+            createdBy: petOwnerId
+        });
+        let feedbackSave = await newFeedback.save();
+        return {
+            feedbackSave
+        };
+    },
 }
 
 export default petOwnerServices;

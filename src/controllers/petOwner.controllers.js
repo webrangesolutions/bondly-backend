@@ -13,7 +13,7 @@ const petOwnerController = {
     async updateMyProfile(req, res, next) {
         let petOwnerId = req.petOwner;
 
-        let profileImage = req.file;
+        let profileImage = req.files['images'] || [];
 
         let { firstName, lastName, locationLat, locationLng, dob, address, emergencyNumber } = req.body;
 
@@ -27,6 +27,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
+            petId,
             requestType,
             pickUpLocation,
             timeSlots,
@@ -45,6 +46,7 @@ const petOwnerController = {
             throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
         }
         let resBody = await petOwnerServices.addPetWalkRequest(
+            petId,
             requestedBy,
             requestType,
             pickUpLocation,
@@ -66,6 +68,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
+            petId,
             requestType,
             confirmationDate,
             confirmationTime,
@@ -85,6 +88,7 @@ const petOwnerController = {
             throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
         }
         let resBody = await petOwnerServices.addPetSittingRequest(
+            petId,
             requestedBy,
             requestType,
             confirmationDate,
@@ -109,6 +113,7 @@ const petOwnerController = {
 
         let requestedBy = req.petOwner;
         const {
+            petId,
             requestType,
             pickUpLocation,
             timeSlots,
@@ -125,6 +130,7 @@ const petOwnerController = {
             throw new createHttpError.BadRequest("Preferred sitting location and at least one time slot are required.");
         }
         let resBody = await petOwnerServices.addDropInRequest(
+            petId,
             requestedBy,
             requestType,
             pickUpLocation,
@@ -207,6 +213,142 @@ const petOwnerController = {
         let { orderId, status } = req.body;
         const resBody = await petOwnerServices.acceptOrderByPetOwner(orderId, status, petOwnerId);
         return res.status(200).send(dataResponse("Pet owner accepted request successfully.", resBody));
+    },
+    async meetAndGreet(req, res, next) {
+
+        let petOwnerId = req.petOwner;
+        console.log(req.params)
+        let {
+            id
+        } = req.params;
+        let petCarerId = id;
+        let {
+            date,
+            time,
+            confirmationDate,
+            preferedSittingLocation,
+            orderPrice
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.meetAndGreet(
+            petOwnerId,
+            petCarerId,
+            date,
+            time,
+            confirmationDate,
+            preferedSittingLocation,
+            orderPrice
+        );
+
+        return res.status(201).send(dataResponse("Meet And Greet Request Sent to PetCarer.", resBody));
+    },
+    async goodFeedbackAndRating(req, res, next) {
+
+        let petOwnerId = req.petOwner;
+        let {
+            orderId,
+            petCarerId,
+            rating,
+            message
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.goodFeedbackAndRating(
+            orderId,
+            petOwnerId,
+            petCarerId,
+            rating,
+            message
+
+        );
+
+        return res.status(201).send(dataResponse("Good FeedBack Send Succesfully.", resBody));
+    },
+    async badFeedbackAndRating(req, res, next) {
+
+        let petOwnerId = req.petOwner;
+        let images = req.files['images'] || [];
+        let {
+            orderId,
+            petCarerId,
+            rating,
+            specialIssues,
+            detailedFeedback
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.badFeedbackAndRating(
+            orderId,
+            petOwnerId,
+            petCarerId,
+            rating,
+            specialIssues,
+            detailedFeedback,
+            images
+        );
+
+        return res.status(201).send(dataResponse("Bad FeedBack Send Succesfully.", resBody));
+    },
+    async removeAsFavourite(req, res, next) {
+        let petOwnerId = req.petOwner;
+        let {
+            petCarerId,
+            specialReasons,
+            message
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.removeAsFavourite(
+            petOwnerId,
+            petCarerId,
+            specialReasons,
+            message
+        );
+
+        return res.status(201).send(dataResponse("Remove As Favourite FeedBack Send Succesfully.", resBody));
+    },
+    async badMeetAndGreetFeedback(req, res, next) {
+
+        let petOwnerId = req.petOwner;
+        let {
+            meetAndGreetId,
+            petCarerId,
+            negativeFeedback,
+            detailedNegativeFeedback
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.badMeetAndGreetFeedback(
+            meetAndGreetId,
+            petOwnerId,
+            petCarerId,
+            negativeFeedback,
+            detailedNegativeFeedback
+        );
+
+        return res.status(201).send(dataResponse("Bad Meet And Greet FeedBack Send Succesfully.", resBody));
+    },
+    async goodMeetAndGreetFeedback(req, res, next) {
+
+        let petOwnerId = req.petOwner;
+        let {
+            meetAndGreetId,
+            petCarerId,
+            positiveFeedback,
+            detailedPositiveFeedback
+        } = req.body;
+        if (!petOwnerId)
+            throw new createHttpError.BadRequest("No petOwner found.");
+        let resBody = await petOwnerServices.goodMeetAndGreetFeedback(
+            meetAndGreetId,
+            petOwnerId,
+            petCarerId,
+            positiveFeedback,
+            detailedPositiveFeedback
+        );
+
+        return res.status(201).send(dataResponse("Bad Meet And Greet FeedBack Send Succesfully.", resBody));
     },
 }
 

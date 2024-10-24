@@ -24,7 +24,7 @@ petCarerRouter.patch('/me',
 
 //-------------Pets---------------//
 petCarerRouter.post(
-    '/pets',
+    '/me/pets',
     multipleUploads,
     authGuard("petCarer"),
     errorHandler(petController.addPetByPetCarer)
@@ -68,4 +68,33 @@ petCarerRouter.patch(
     errorHandler(petCarerController.completeOrderByPetCarer)
 );
 
+// petCarerRouter.patch(
+//     '/me/updateRating',
+//     authGuard("petCarer"),
+//     errorHandler(petCarerController.updateRating)
+// );
+// petCarerRouter.patch(
+//     '/me/updatePoints',
+//     authGuard("petCarer"),
+//     errorHandler(petCarerController.updatePoints)
+// );
+petCarerRouter.post(
+    '/me/contactus',
+    authGuard("petCarer"),
+    errorHandler(petCarerController.contactus)
+);
+
+petCarerRouter.post(
+    "/me/petCarerFeedback",
+    multipleUploads,
+    authGuard("petCarer"),
+    // bodyValidator(),
+    errorHandler(petCarerController.petCarerFeedback)
+);
+petCarerRouter.post(
+    "/me/meetAndGreetFeedback",
+    authGuard("petCarer"),
+    // bodyValidator(),
+    errorHandler(petCarerController.meetAndGreetFeedback)
+);
 export default petCarerRouter;
